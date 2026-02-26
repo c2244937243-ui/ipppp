@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>狼人杀 · 单机版</title>
-<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+QingKe+HuangYou&family=Noto+Serif+SC:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --ink: #1a0f00;
@@ -18,316 +18,216 @@
   --gold2: #c8921a;
   --blue-ink: #1a3a5c;
   --green-ink: #1a4a2a;
-  --fade: rgba(26,15,0,0.08);
-  --shadow: rgba(26,15,0,0.25);
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
 
 body {
   font-family: 'Noto Serif SC', serif;
-  background: var(--ink);
+  background: #0d0800;
   min-height: 100vh;
   color: var(--ink);
   overflow-x: hidden;
 }
 
-/* Parchment texture overlay */
-body::before {
-  content:'';
-  position:fixed; inset:0;
-  background: repeating-linear-gradient(
-    0deg, transparent, transparent 2px,
-    rgba(26,15,0,0.015) 2px, rgba(26,15,0,0.015) 4px
-  );
-  pointer-events:none; z-index:0;
-}
-
 /* ===== SCREENS ===== */
-.screen { display:none; }
-.screen.active { display:block; }
-#s-title.active { display:flex; flex-direction:column; align-items:center; justify-content:center; }
-#s-game.active  { display:grid; }
+.screen { display:none; min-height:100vh; }
+#s-title.active {
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  background: radial-gradient(ellipse at 50% 40%, #2d1a05 0%, #0d0800 100%);
+  padding:40px 20px; text-align:center;
+}
+#s-game.active {
+  display:flex; flex-direction:column;
+  background: linear-gradient(135deg, #1a0e04 0%, #0d0800 50%, #1a0a04 100%);
+  max-width:700px; margin:0 auto;
+}
 
 /* ===== TITLE ===== */
-#s-title {
-  min-height:100vh;
-  background: radial-gradient(ellipse at 50% 40%, #2d1a05 0%, #0d0800 100%);
-  text-align:center; padding:40px 20px;
-}
-
 .title-scroll {
   background: linear-gradient(180deg, #e8d5a0 0%, #f0e4b8 30%, #f0e4b8 70%, #e8d5a0 100%);
   border: 3px solid var(--gold);
   padding: 50px 60px;
-  max-width: 480px;
-  width: 100%;
+  max-width: 460px; width: 100%;
   position: relative;
   box-shadow: 0 0 60px rgba(139,105,20,0.3), inset 0 0 40px rgba(200,146,26,0.1);
 }
-
 .title-scroll::before, .title-scroll::after {
-  content:'';
-  position:absolute; left:-12px; right:-12px; height:30px;
+  content:''; position:absolute; left:-12px; right:-12px; height:28px;
   background: linear-gradient(180deg, #8b6914, #c8921a, #8b6914);
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  border-radius:4px; box-shadow:0 2px 8px rgba(0,0,0,0.4);
 }
-.title-scroll::before { top:-14px; }
-.title-scroll::after { bottom:-14px; }
+.title-scroll::before { top:-13px; }
+.title-scroll::after  { bottom:-13px; }
 
-.title-eyebrow {
-  font-family: 'ZCOOL QingKe HuangYou', cursive;
-  font-size:12px; letter-spacing:0.5em; color:var(--gold); margin-bottom:16px;
-}
+.title-eyebrow { font-size:11px; letter-spacing:0.5em; color:var(--gold); margin-bottom:16px; }
 
 h1.main-title {
   font-family: 'Ma Shan Zheng', cursive;
-  font-size: clamp(52px, 15vw, 88px);
+  font-size: clamp(52px,15vw,88px);
   color: var(--red);
   text-shadow: 2px 2px 0 rgba(139,26,26,0.3), 4px 4px 8px rgba(0,0,0,0.2);
-  letter-spacing: 0.15em;
-  line-height: 1;
-  margin-bottom: 8px;
+  letter-spacing:0.15em; line-height:1; margin-bottom:8px;
 }
-
 .title-sub {
-  font-size:13px; color:var(--gold); letter-spacing:0.3em; margin-bottom:32px;
-  border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold);
-  padding: 8px 0;
+  font-size:12px; color:var(--gold); letter-spacing:0.3em;
+  border-top:1px solid var(--gold); border-bottom:1px solid var(--gold);
+  padding:8px 0; margin-bottom:28px;
 }
-
-.title-seal {
-  font-size:48px; margin-bottom:20px;
-  animation: sealBreath 3s ease-in-out infinite alternate;
-}
+.title-seal { font-size:48px; margin-bottom:20px; animation:sealBreath 3s ease-in-out infinite alternate; }
 @keyframes sealBreath {
   from { transform:scale(0.96) rotate(-2deg); filter:drop-shadow(0 0 8px rgba(139,26,26,0.4)); }
   to   { transform:scale(1.04) rotate(2deg);  filter:drop-shadow(0 0 20px rgba(139,26,26,0.7)); }
 }
+.title-flavor { font-size:13px; color:var(--ink2); line-height:1.8; margin-bottom:28px; font-style:italic; }
 
-.title-flavor {
-  font-size:13px; color:var(--ink2); line-height:1.8; margin-bottom:28px;
-  font-style:italic;
-}
-
-/* Difficulty picker */
-.diff-row {
-  display:flex; gap:8px; justify-content:center; margin-bottom:20px;
-}
+.diff-label { font-size:12px; color:var(--gold); margin-bottom:10px; letter-spacing:0.2em; }
+.diff-row { display:flex; gap:8px; justify-content:center; margin-bottom:24px; }
 .diff-btn {
   background:none; border:1px solid var(--gold);
   font-family:'Noto Serif SC',serif; font-size:12px;
-  padding:6px 14px; cursor:pointer; color:var(--ink2);
+  padding:8px 16px; cursor:pointer; color:var(--ink2);
   transition:all 0.2s; letter-spacing:0.1em;
 }
 .diff-btn.active, .diff-btn:hover { background:var(--gold); color:var(--parchment); }
 
 .start-btn {
-  background: var(--red); border: 2px solid var(--red2);
-  color: var(--parchment); font-family:'Ma Shan Zheng',cursive;
+  background:var(--red); border:2px solid var(--red2);
+  color:var(--parchment); font-family:'Ma Shan Zheng',cursive;
   font-size:22px; padding:14px 48px; cursor:pointer; letter-spacing:0.3em;
-  transition:all 0.2s; clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+  transition:all 0.2s; display:inline-block;
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
   box-shadow:0 4px 20px rgba(139,26,26,0.4);
 }
-.start-btn:hover { background:var(--red2); transform:translateY(-2px); box-shadow:0 8px 30px rgba(192,57,43,0.5); }
+.start-btn:hover { background:var(--red2); transform:translateY(-2px); }
 .start-btn:active { transform:translateY(0); }
 
-/* ===== GAME LAYOUT ===== */
-#s-game {
-  min-height:100vh;
-  background: linear-gradient(135deg, #1a0e04 0%, #0d0800 50%, #1a0a04 100%);
-  grid-template-rows: auto 1fr auto;
-  grid-template-columns: 1fr;
-  max-width:700px; margin:0 auto;
-  padding-bottom:20px;
-}
-
-/* Header */
+/* ===== GAME HEADER ===== */
 .game-hdr {
-  background: linear-gradient(90deg, #2d1a05, #1a0f00, #2d1a05);
-  border-bottom: 2px solid var(--gold);
+  background: linear-gradient(90deg,#2d1a05,#1a0f00,#2d1a05);
+  border-bottom:2px solid var(--gold);
   padding:10px 20px;
   display:flex; align-items:center; justify-content:space-between;
-  position:sticky; top:0; z-index:50;
+  position:sticky; top:0; z-index:10;
 }
-
-.phase-indicator {
-  font-family:'Ma Shan Zheng',cursive;
-  font-size:22px; letter-spacing:0.3em;
-}
-.phase-indicator.night { color:#a0c8ff; text-shadow:0 0 15px rgba(160,200,255,0.6); }
-.phase-indicator.day   { color:#ffd080; text-shadow:0 0 15px rgba(255,208,128,0.6); }
-
+.phase-indicator { font-family:'Ma Shan Zheng',cursive; font-size:22px; letter-spacing:0.3em; }
+.phase-indicator.night { color:#a0c8ff; text-shadow:0 0 15px rgba(160,200,255,0.5); }
+.phase-indicator.day   { color:#ffd080; text-shadow:0 0 15px rgba(255,208,128,0.5); }
 .round-badge {
-  background: rgba(139,105,20,0.2); border:1px solid var(--gold);
+  background:rgba(139,105,20,0.2); border:1px solid var(--gold);
   padding:4px 12px; font-size:12px; color:var(--gold); letter-spacing:0.15em;
 }
 
-/* Main area */
-.game-main {
-  padding:16px;
-  display:flex; flex-direction:column; gap:14px;
-}
-
-/* Players table - round arrangement */
+/* ===== PLAYERS GRID ===== */
 .village-table {
-  background: linear-gradient(135deg, #e8d5a0, #f0e4b8, #e0cc90);
-  border: 3px solid var(--gold);
-  border-radius:4px;
-  padding:20px 16px;
-  position:relative;
-  box-shadow: inset 0 0 30px rgba(139,105,20,0.15), 0 4px 20px rgba(0,0,0,0.5);
+  background:linear-gradient(135deg,#e8d5a0,#f0e4b8,#e0cc90);
+  border:3px solid var(--gold); margin:16px;
+  padding:20px 16px; position:relative;
+  box-shadow:inset 0 0 30px rgba(139,105,20,0.15),0 4px 20px rgba(0,0,0,0.5);
 }
-
 .village-table::before {
   content:'🏘️ 村庄议事台';
-  position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+  position:absolute; top:-13px; left:50%; transform:translateX(-50%);
   background:var(--parchment2); border:1px solid var(--gold);
-  padding:2px 14px; font-size:11px; color:var(--gold); letter-spacing:0.2em;
-  white-space:nowrap;
+  padding:2px 14px; font-size:11px; color:var(--gold); letter-spacing:0.2em; white-space:nowrap;
 }
-
 .players-ring {
   display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px,1fr));
-  gap:10px;
+  grid-template-columns:repeat(auto-fill,minmax(88px,1fr));
+  gap:10px; margin-top:4px;
 }
-
 .player-card {
-  background: linear-gradient(180deg, #fdf5e0, #f5e8c0);
-  border: 2px solid var(--parchment3);
-  padding:10px 6px 8px;
-  text-align:center; cursor:default;
+  background:linear-gradient(180deg,#fdf5e0,#f5e8c0);
+  border:2px solid var(--parchment3);
+  padding:10px 6px 8px; text-align:center;
   position:relative; transition:all 0.2s;
-  box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+  box-shadow:2px 2px 6px rgba(0,0,0,0.15);
+  cursor:default; user-select:none;
 }
-
 .player-card.is-you {
-  border-color: var(--gold2);
-  box-shadow: 0 0 0 2px rgba(200,146,26,0.3), 2px 2px 6px rgba(0,0,0,0.15);
+  border-color:var(--gold2);
+  box-shadow:0 0 0 2px rgba(200,146,26,0.3),2px 2px 6px rgba(0,0,0,0.15);
 }
-
-.player-card.selectable {
-  cursor:pointer;
-  border-color: var(--red);
-}
+.player-card.selectable { cursor:pointer; border-color:var(--red); }
 .player-card.selectable:hover {
   transform:translateY(-3px) scale(1.03);
-  box-shadow: 0 6px 16px rgba(139,26,26,0.3);
+  box-shadow:0 6px 16px rgba(139,26,26,0.3);
   border-color:var(--red2);
-  background: linear-gradient(180deg, #fff0e0, #ffe0c0);
+  background:linear-gradient(180deg,#fff0e0,#ffe0c0);
 }
-
 .player-card.selected {
   border-color:var(--red2); background:linear-gradient(180deg,#ffe8e0,#ffd0c0);
-  box-shadow:0 0 0 3px rgba(192,57,43,0.4), 2px 2px 6px rgba(0,0,0,0.2);
-  transform:translateY(-3px);
+  box-shadow:0 0 0 3px rgba(192,57,43,0.4); transform:translateY(-3px);
 }
-
-.player-card.dead {
-  opacity:0.4; cursor:default; filter:grayscale(0.5);
+.player-card.dead { opacity:0.35; cursor:default; filter:grayscale(0.5); }
+.player-card.dead .death-mark {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-size:36px; color:var(--red); opacity:0.6; pointer-events:none;
 }
-.player-card.dead::after {
-  content:'†'; position:absolute; inset:0;
-  display:flex; align-items:center; justify-content:center;
-  font-size:36px; color:var(--red); opacity:0.6;
-}
-
-.pc-seat { font-size:9px; color:var(--gold); margin-bottom:3px; letter-spacing:0.1em; }
-.pc-avatar { font-size:26px; line-height:1; margin-bottom:4px; }
-.pc-name { font-size:11px; color:var(--ink); font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.pc-role-tag {
-  font-size:9px; margin-top:3px;
-  padding:1px 6px; display:inline-block;
-}
-.pc-role-tag.wolf { background:rgba(139,26,26,0.15); color:var(--red); border:1px solid rgba(139,26,26,0.3); }
-.pc-role-tag.good { background:rgba(26,74,42,0.15); color:var(--green-ink); border:1px solid rgba(26,74,42,0.3); }
-
+.pc-seat  { font-size:9px; color:var(--gold); margin-bottom:3px; letter-spacing:0.1em; }
+.pc-avatar{ font-size:26px; line-height:1; margin-bottom:4px; }
+.pc-name  { font-size:11px; color:var(--ink); font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pc-role  { font-size:9px; margin-top:3px; padding:1px 6px; display:inline-block; }
+.pc-role.wolf    { background:rgba(139,26,26,0.15); color:var(--red); border:1px solid rgba(139,26,26,0.3); }
+.pc-role.village { background:rgba(26,74,42,0.15); color:var(--green-ink); border:1px solid rgba(26,74,42,0.3); }
 .you-badge {
   position:absolute; top:-8px; right:4px;
-  background:var(--gold); color:var(--parchment); font-size:8px;
-  padding:1px 5px; letter-spacing:0.1em;
+  background:var(--gold); color:var(--parchment); font-size:8px; padding:1px 5px;
 }
 
-/* Speech bubbles log */
+/* ===== SPEECH LOG ===== */
 .speech-log {
-  background: linear-gradient(180deg, #1a0f00, #0d0800);
-  border: 1px solid rgba(139,105,20,0.3);
-  padding:14px;
-  max-height:280px; overflow-y:auto;
+  background:linear-gradient(180deg,#1a0f00,#0d0800);
+  border:1px solid rgba(139,105,20,0.3);
+  margin:0 16px; padding:14px;
+  max-height:260px; overflow-y:auto;
   display:flex; flex-direction:column; gap:10px;
 }
-
 .speech-log::-webkit-scrollbar { width:3px; }
 .speech-log::-webkit-scrollbar-thumb { background:var(--gold); }
 
-.speech-item {
-  display:flex; gap:10px; align-items:flex-start;
-  animation: speechIn 0.4s ease-out;
-}
-@keyframes speechIn {
-  from { opacity:0; transform:translateX(-12px); }
-  to   { opacity:1; transform:translateX(0); }
-}
-
+.speech-item { display:flex; gap:10px; align-items:flex-start; animation:speechIn 0.35s ease-out; }
+@keyframes speechIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
 .speech-item.right { flex-direction:row-reverse; }
-.speech-item.system { justify-content:center; flex-direction:column; align-items:center; }
+.speech-item.system { justify-content:center; }
 
 .speech-avatar-sm { font-size:22px; flex-shrink:0; }
 
-.bubble {
-  max-width:75%; padding:8px 12px;
-  position:relative; line-height:1.6;
-  font-size:13px;
-}
-
+.bubble { max-width:75%; padding:8px 12px; line-height:1.6; font-size:13px; }
 .speech-item:not(.right):not(.system) .bubble {
-  background: linear-gradient(135deg, #f0e4b8, #e8d8a0);
-  color:var(--ink); border:1px solid var(--parchment3);
-  border-radius:0 8px 8px 8px;
+  background:linear-gradient(135deg,#f0e4b8,#e8d8a0); color:var(--ink);
+  border:1px solid var(--parchment3); border-radius:0 8px 8px 8px;
 }
 .speech-item.right .bubble {
-  background: linear-gradient(135deg, #3a1a08, #2a1205);
-  color:#e8d5b0; border:1px solid rgba(200,146,26,0.3);
-  border-radius:8px 0 8px 8px;
+  background:linear-gradient(135deg,#3a1a08,#2a1205); color:#e8d5b0;
+  border:1px solid rgba(200,146,26,0.3); border-radius:8px 0 8px 8px;
 }
 .speech-item.system .bubble {
   background:rgba(139,26,26,0.15); border:1px solid rgba(139,26,26,0.3);
-  color:#e0a080; font-size:12px; letter-spacing:0.05em; text-align:center;
-  border-radius:4px; width:100%;
+  color:#e0a080; font-size:12px; letter-spacing:0.05em;
+  text-align:center; border-radius:4px; width:100%;
 }
-
-.bubble-name {
-  font-size:10px; margin-bottom:3px; opacity:0.7; font-weight:700;
-}
+.bubble-name { font-size:10px; margin-bottom:3px; opacity:0.7; font-weight:700; }
 .speech-item.right .bubble-name { text-align:right; }
 
-.speech-item.wolf-talk .bubble { border-color:rgba(139,26,26,0.5); background:linear-gradient(135deg,#3a0808,#200505); color:#ffb0a0; }
-
-/* Action panel */
+/* ===== ACTION PANEL ===== */
 .action-panel {
-  background: linear-gradient(180deg, #e8d5a0, #dcc888);
-  border: 2px solid var(--gold);
-  padding:16px;
+  background:linear-gradient(180deg,#e8d5a0,#dcc888);
+  border:2px solid var(--gold); margin:16px; padding:16px;
 }
-
-.action-panel-title {
-  font-family:'ZCOOL QingKe HuangYou',cursive;
+.action-title {
   font-size:14px; color:var(--red); letter-spacing:0.3em;
   margin-bottom:10px; border-bottom:1px solid var(--gold2); padding-bottom:6px;
 }
-
-.action-desc {
-  font-size:13px; color:var(--ink2); line-height:1.8; margin-bottom:12px;
-}
-
-.action-btns-row {
-  display:flex; gap:8px; flex-wrap:wrap;
-}
+.skill-res { display:flex; gap:8px; font-size:12px; color:var(--gold); margin-bottom:8px; }
+.skill-pip { padding:2px 8px; border:1px solid var(--gold2); background:rgba(139,105,20,0.15); }
+.skill-pip.used { opacity:0.3; text-decoration:line-through; }
+.action-desc { font-size:13px; color:var(--ink2); line-height:1.8; margin-bottom:12px; min-height:20px; }
+.action-btns { display:flex; gap:8px; flex-wrap:wrap; }
 
 .ink-btn {
-  background: var(--ink); border:1px solid var(--gold);
+  background:var(--ink); border:1px solid var(--gold);
   color:var(--parchment); font-family:'Noto Serif SC',serif;
   font-size:13px; padding:8px 20px; cursor:pointer;
   letter-spacing:0.1em; transition:all 0.2s;
@@ -335,945 +235,375 @@ h1.main-title {
 }
 .ink-btn:hover { background:var(--red); border-color:var(--red2); transform:translateY(-1px); }
 .ink-btn:active { transform:translateY(0); }
-.ink-btn.gold-btn { background:var(--gold); border-color:var(--gold2); color:var(--ink); }
-.ink-btn.gold-btn:hover { background:var(--gold2); }
+.ink-btn.gold { background:var(--gold); border-color:var(--gold2); color:var(--ink); }
+.ink-btn.gold:hover { background:var(--gold2); }
 
-/* Role card overlay */
-.role-reveal-overlay {
+/* ===== MODAL OVERLAY (shared for role reveal, night info, alerts) ===== */
+.modal-overlay {
   position:fixed; inset:0; z-index:200;
-  background:rgba(5,2,0,0.92);
-  display:flex; align-items:center; justify-content:center;
-  backdrop-filter:blur(6px);
+  background:rgba(5,2,0,0.9);
+  display:none; align-items:center; justify-content:center;
+  backdrop-filter:blur(4px);
 }
+.modal-overlay.open { display:flex; }
 
-.role-card-big {
-  background: linear-gradient(160deg, #f5e8c0, #ecdba0, #f0e4b8);
-  border: 4px solid var(--gold);
-  padding:40px 50px; max-width:360px; width:90%;
-  text-align:center; position:relative;
-  box-shadow: 0 0 60px rgba(139,105,20,0.5), inset 0 0 40px rgba(200,146,26,0.1);
-  animation:cardIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+.modal-box {
+  background:linear-gradient(160deg,#f5e8c0,#ecdba0,#f0e4b8);
+  border:4px solid var(--gold); padding:36px 44px;
+  max-width:380px; width:90%; text-align:center; position:relative;
+  box-shadow:0 0 60px rgba(139,105,20,0.5);
+  animation:modalIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
 }
-@keyframes cardIn {
-  from { opacity:0; transform:scale(0.6) rotate(-5deg); }
-  to   { opacity:1; transform:scale(1) rotate(0); }
-}
-
-.role-card-big::before, .role-card-big::after {
-  content:''; position:absolute; left:-8px; right:-8px; height:24px;
+@keyframes modalIn { from{opacity:0;transform:scale(0.7) rotate(-4deg)} to{opacity:1;transform:scale(1) rotate(0)} }
+.modal-box::before, .modal-box::after {
+  content:''; position:absolute; left:-8px; right:-8px; height:22px;
   background:linear-gradient(90deg,var(--gold),var(--gold2),var(--gold));
 }
-.role-card-big::before { top:-10px; }
-.role-card-big::after { bottom:-10px; }
+.modal-box::before { top:-10px; }
+.modal-box::after  { bottom:-10px; }
 
-.rc-team { font-size:11px; letter-spacing:0.4em; margin-bottom:16px; }
-.rc-team.wolf { color:var(--red); }
-.rc-team.village { color:var(--green-ink); }
-
-.rc-icon { font-size:72px; margin-bottom:12px; animation:iconPop 0.6s 0.3s ease-out both; }
-@keyframes iconPop {
-  from { transform:scale(0); }
-  to   { transform:scale(1); }
+/* Night-mode modal */
+.modal-box.night-mode {
+  background:linear-gradient(160deg,#080520,#050318);
+  border-color:#4040a0;
+  box-shadow:0 0 60px rgba(80,80,200,0.4);
+}
+.modal-box.night-mode::before, .modal-box.night-mode::after {
+  background:linear-gradient(90deg,#2020a0,#6060d0,#2020a0);
 }
 
-.rc-name {
-  font-family:'Ma Shan Zheng',cursive; font-size:42px;
-  letter-spacing:0.2em; margin-bottom:10px;
-}
-.rc-name.wolf { color:var(--red); }
-.rc-name.village { color:var(--blue-ink); }
-.rc-name.witch-c { color:#5a1a6a; }
-.rc-name.seer-c { color:var(--blue-ink); }
-.rc-name.guard-c { color:var(--green-ink); }
+.modal-icon  { font-size:64px; margin-bottom:12px; animation:iconPop 0.5s 0.2s ease-out both; }
+@keyframes iconPop { from{transform:scale(0)} to{transform:scale(1)} }
+.modal-team  { font-size:11px; letter-spacing:0.4em; margin-bottom:12px; }
+.modal-team.wolf    { color:var(--red); }
+.modal-team.village { color:var(--green-ink); }
+.modal-team.night   { color:#8080ff; }
+.modal-title { font-family:'Ma Shan Zheng',cursive; font-size:36px; letter-spacing:0.2em; margin-bottom:8px; }
+.modal-title.wolf    { color:var(--red); }
+.modal-title.village { color:var(--blue-ink); }
+.modal-title.night   { color:#a0a0ff; }
+.modal-divider { border:none; border-top:1px solid var(--gold2); margin:10px 0; }
+.modal-divider.night { border-color:#3030a0; }
+.modal-desc  { font-size:13px; color:var(--ink2); line-height:1.8; margin-bottom:10px; }
+.modal-desc.night { color:#8090c0; }
+.modal-skill { background:rgba(26,15,0,0.08); border:1px solid rgba(139,105,20,0.3); padding:10px 14px; font-size:12px; color:var(--ink2); margin-bottom:20px; text-align:left; line-height:1.6; }
+.modal-skill.night { background:rgba(0,0,30,0.5); border-color:#2020a0; color:#8090c0; }
+.modal-secret { background:rgba(0,0,30,0.6); border:1px solid rgba(80,80,200,0.3); padding:16px 24px; margin:16px 0; }
+.modal-secret-label { font-size:10px; color:#6070a0; letter-spacing:0.3em; margin-bottom:8px; }
+.modal-secret-value { font-size:20px; color:#c0c8ff; font-family:'Ma Shan Zheng',cursive; letter-spacing:0.15em; }
+.modal-btns  { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:4px; }
 
-.rc-divider {
-  border: none; border-top:1px solid var(--gold2); margin:12px 0;
-}
-
-.rc-desc {
-  font-size:13px; color:var(--ink2); line-height:1.8; margin-bottom:24px;
-}
-
-.rc-skill {
-  background:rgba(26,15,0,0.08); border:1px solid rgba(139,105,20,0.3);
-  padding:10px 14px; font-size:12px; color:var(--ink2); margin-bottom:20px;
-  text-align:left; line-height:1.6;
-}
-
-/* Night overlay */
-.night-overlay {
-  position:fixed; inset:0; z-index:100;
-  background:rgba(0,5,20,0.97);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  text-align:center; padding:30px;
-}
-
-.night-title {
-  font-family:'Ma Shan Zheng',cursive; font-size:52px;
-  color:#8080ff; text-shadow:0 0 30px rgba(128,128,255,0.8);
-  margin-bottom:16px; letter-spacing:0.3em;
-  animation:nightGlow 2s ease-in-out infinite alternate;
-}
-@keyframes nightGlow {
-  from { text-shadow:0 0 20px rgba(128,128,255,0.5); }
-  to   { text-shadow:0 0 50px rgba(128,128,255,1); }
-}
-
-.night-msg { color:#8090c0; font-size:15px; line-height:1.8; margin-bottom:24px; }
-
-.night-secret-box {
-  background:rgba(10,15,40,0.9); border:1px solid rgba(80,80,200,0.3);
-  padding:20px 30px; margin:16px 0; min-width:280px;
-}
-.night-secret-label { font-size:11px; color:#6070a0; letter-spacing:0.3em; margin-bottom:10px; }
-.night-secret-value { font-size:18px; color:#c0c8ff; font-family:'Ma Shan Zheng',cursive; letter-spacing:0.15em; }
-
-/* Vote tally */
-.vote-tally {
-  display:flex; flex-direction:column; gap:6px; margin:10px 0;
-}
-.vote-bar-row {
-  display:flex; align-items:center; gap:8px; font-size:12px; color:var(--ink2);
-}
-.vote-bar {
-  height:12px; background:var(--red); transition:width 0.5s;
-  min-width:4px;
-}
-.vote-count { font-weight:700; color:var(--red); min-width:20px; }
-
-/* Win screen */
-.win-screen {
+/* ===== WIN SCREEN ===== */
+#win-screen {
   position:fixed; inset:0; z-index:300;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  display:none; flex-direction:column; align-items:center; justify-content:center;
   text-align:center; padding:30px;
 }
-.win-screen.wolf-win { background:radial-gradient(ellipse,#3a0808,#0d0200); }
-.win-screen.village-win { background:radial-gradient(ellipse,#1a3020,#050d08); }
+#win-screen.wolf-win    { background:radial-gradient(ellipse,#3a0808,#0d0200); }
+#win-screen.village-win { background:radial-gradient(ellipse,#1a3020,#050d08); }
+#win-screen.open { display:flex; }
 
-.win-icon { font-size:80px; animation:winPulse 1.5s ease-in-out infinite alternate; margin-bottom:16px; }
-@keyframes winPulse {
-  from { transform:scale(0.9); filter:drop-shadow(0 0 10px gold); }
-  to   { transform:scale(1.1); filter:drop-shadow(0 0 40px gold); }
-}
-
-.win-title {
-  font-family:'Ma Shan Zheng',cursive; font-size:56px; letter-spacing:0.3em; margin-bottom:10px;
-}
-.wolf-win .win-title { color:#ff6060; text-shadow:0 0 30px rgba(255,96,96,0.7); }
+.win-icon  { font-size:80px; margin-bottom:16px; animation:winPulse 1.5s ease-in-out infinite alternate; }
+@keyframes winPulse { from{transform:scale(0.9);filter:drop-shadow(0 0 10px gold)} to{transform:scale(1.1);filter:drop-shadow(0 0 40px gold)} }
+.win-title { font-family:'Ma Shan Zheng',cursive; font-size:52px; letter-spacing:0.3em; margin-bottom:10px; }
+.wolf-win .win-title    { color:#ff6060; text-shadow:0 0 30px rgba(255,96,96,0.7); }
 .village-win .win-title { color:#80e0a0; text-shadow:0 0 30px rgba(128,224,160,0.7); }
-
-.win-sub { color:#aaa; font-size:14px; margin-bottom:24px; }
-
-.reveal-list {
-  display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:28px;
-  max-width:400px;
-}
-.reveal-chip {
-  background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
-  padding:6px 14px; font-size:12px; color:#ddd;
-}
-
-/* Typing indicator */
-.typing {
-  display:flex; gap:4px; align-items:center; padding:4px 0;
-}
-.typing span {
-  width:6px; height:6px; background:var(--gold); border-radius:50%;
-  animation:typingBounce 1s ease-in-out infinite;
-}
-.typing span:nth-child(2) { animation-delay:0.15s; }
-.typing span:nth-child(3) { animation-delay:0.3s; }
-@keyframes typingBounce {
-  0%,60%,100% { transform:translateY(0); opacity:0.5; }
-  30% { transform:translateY(-6px); opacity:1; }
-}
-
-/* Skill resources display */
-.skill-res {
-  display:flex; gap:8px; font-size:12px; color:var(--gold); margin-bottom:8px;
-}
-.skill-pip { padding:2px 8px; border:1px solid var(--gold2); background:rgba(139,105,20,0.15); }
-.skill-pip.used { opacity:0.3; text-decoration:line-through; }
-
-/* Fade overlay for transition */
-.fade-overlay {
-  position:fixed; inset:0; z-index:150; background:#000;
-  pointer-events:none; opacity:0; transition:opacity 0.4s;
-}
-.fade-overlay.show { opacity:1; }
+.win-sub   { color:#aaa; font-size:14px; margin-bottom:24px; }
+.reveal-list { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:28px; max-width:420px; }
+.reveal-chip { background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:6px 14px; font-size:12px; color:#ddd; }
 </style>
 </head>
 <body>
-<div class="fade-overlay" id="fade-overlay"></div>
 
-<!-- TITLE -->
-<div id="s-title" class="screen active">
+<!-- ===== TITLE ===== -->
+<div id="s-title" class="screen">
   <div class="title-scroll">
     <div class="title-eyebrow">· 单人挑战 · 人机对战 ·</div>
     <div class="title-seal">🐺</div>
     <h1 class="main-title">狼人杀</h1>
     <div class="title-sub">夜色中的真相</div>
     <div class="title-flavor">黑夜降临，狼人醒来。<br>你能找出潜伏在村庄中的恶魔吗？<br>还是说，你就是那头披着羊皮的狼……</div>
-    <div style="font-size:12px;color:var(--gold);margin-bottom:12px;letter-spacing:0.2em;">选择难度</div>
+    <div class="diff-label">选择难度</div>
     <div class="diff-row">
       <button class="diff-btn active" id="diff-easy">简单<br><span style="font-size:10px">6人局</span></button>
       <button class="diff-btn" id="diff-normal">普通<br><span style="font-size:10px">8人局</span></button>
       <button class="diff-btn" id="diff-hard">困难<br><span style="font-size:10px">10人局</span></button>
     </div>
-    <br>
     <button class="start-btn" id="btn-start">入村</button>
   </div>
 </div>
 
-<!-- GAME -->
+<!-- ===== GAME ===== -->
 <div id="s-game" class="screen">
   <div class="game-hdr">
     <div class="phase-indicator night" id="phase-indicator">🌑 黑夜</div>
     <div class="round-badge" id="round-badge">第 1 夜</div>
   </div>
+  <div class="village-table">
+    <div class="players-ring" id="players-ring"></div>
+  </div>
+  <div class="speech-log" id="speech-log"></div>
+  <div class="action-panel">
+    <div class="action-title" id="action-title">◈ 等待中</div>
+    <div class="skill-res" id="skill-res"></div>
+    <div class="action-desc" id="action-desc"></div>
+    <div class="action-btns" id="action-btns"></div>
+  </div>
+</div>
 
-  <div class="game-main">
-    <!-- Players -->
-    <div class="village-table">
-      <div class="players-ring" id="players-ring"></div>
+<!-- ===== MODAL (single shared overlay) ===== -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-icon"  id="modal-icon">🐺</div>
+    <div class="modal-team"  id="modal-team"></div>
+    <div class="modal-title" id="modal-title"></div>
+    <hr class="modal-divider" id="modal-divider">
+    <div class="modal-desc"  id="modal-desc"></div>
+    <div class="modal-skill" id="modal-skill" style="display:none"></div>
+    <div class="modal-secret" id="modal-secret" style="display:none">
+      <div class="modal-secret-label" id="modal-secret-label"></div>
+      <div class="modal-secret-value" id="modal-secret-value"></div>
     </div>
-
-    <!-- Speech log -->
-    <div class="speech-log" id="speech-log"></div>
-
-    <!-- Action panel -->
-    <div class="action-panel" id="action-panel">
-      <div class="action-panel-title" id="action-title">◈ 等待中</div>
-      <div class="skill-res" id="skill-res" style="display:none"></div>
-      <div class="action-desc" id="action-desc">游戏准备中...</div>
-      <div class="action-btns-row" id="action-btns"></div>
-    </div>
+    <div class="modal-btns"  id="modal-btns"></div>
   </div>
 </div>
 
-<!-- Role reveal overlay -->
-<div id="role-overlay" class="role-reveal-overlay" style="display:none">
-  <div class="role-card-big" id="role-card">
-    <div class="rc-team" id="rc-team">·好人阵营·</div>
-    <div class="rc-icon" id="rc-icon">🧑‍🌾</div>
-    <div class="rc-name" id="rc-name">村民</div>
-    <hr class="rc-divider">
-    <div class="rc-desc" id="rc-desc">普通村民</div>
-    <div class="rc-skill" id="rc-skill">技能说明</div>
-    <button class="ink-btn" id="btn-close-role">我已知晓，进入游戏</button>
-  </div>
-</div>
-
-<!-- Night action overlay -->
-<div id="night-overlay" class="night-overlay" style="display:none">
-  <div class="night-title" id="night-overlay-title">🌑 黑夜降临</div>
-  <div class="night-msg" id="night-overlay-msg">所有人请闭上眼睛...</div>
-  <div class="night-secret-box" id="night-secret-box" style="display:none">
-    <div class="night-secret-label" id="night-secret-label">查验结果</div>
-    <div class="night-secret-value" id="night-secret-value">---</div>
-  </div>
-  <button class="ink-btn" id="night-overlay-btn">确认</button>
-</div>
-
-<!-- Win screen -->
-<div id="win-screen" class="win-screen" style="display:none">
-  <div class="win-icon" id="win-icon">🏆</div>
+<!-- ===== WIN ===== -->
+<div id="win-screen">
+  <div class="win-icon"  id="win-icon">🏆</div>
   <div class="win-title" id="win-title">游戏结束</div>
-  <div class="win-sub" id="win-sub">---</div>
+  <div class="win-sub"   id="win-sub"></div>
   <div class="reveal-list" id="reveal-list"></div>
   <button class="start-btn" id="btn-replay">再来一局</button>
 </div>
 
 <script>
-// ===== CONSTANTS =====
-const ROLE_DATA = {
-  wolf:     { name:'狼人',  icon:'🐺', team:'wolf',    color:'wolf-c',   skill:'每夜与狼队商议后击杀一名玩家。白天伪装身份，参与投票驱逐好人。' },
-  seer:     { name:'预言家',icon:'🔮', team:'village', color:'seer-c',   skill:'每夜可查验一名玩家的真实身份（狼人/好人）。利用信息引导村民。' },
-  witch:    { name:'女巫',  icon:'⚗️', team:'village', color:'witch-c',  skill:'拥有解药×1（救狼杀目标）和毒药×1（夜晚毒杀任意玩家）。' },
-  guard:    { name:'守卫',  icon:'🛡️', team:'village', color:'guard-c',  skill:'每夜可守护一名玩家免受狼杀。不可连续守护同一人。' },
-  hunter:   { name:'猎人',  icon:'🔫', team:'village', color:'guard-c',  skill:'死亡时可立即开枪带走一名玩家（被毒死时无法开枪）。' },
-  villager: { name:'村民',  icon:'🧑‍🌾',team:'village', color:'village-c',skill:'凭借智慧和口才，在白天讨论中找出狼人并投票驱逐。' },
+// ============================================================
+// DATA
+// ============================================================
+const ROLES = {
+  wolf:     { name:'狼人',  icon:'🐺', team:'wolf',    skill:'每夜与狼队商议后击杀一名玩家。白天伪装身份参与投票。' },
+  seer:     { name:'预言家',icon:'🔮', team:'village', skill:'每夜可查验一名玩家身份（狼人/好人）。' },
+  witch:    { name:'女巫',  icon:'⚗️', team:'village', skill:'拥有解药×1（救当晚被杀者）和毒药×1（毒杀任意玩家）。' },
+  guard:    { name:'守卫',  icon:'🛡️', team:'village', skill:'每夜守护一名玩家免受狼杀，不可连续守护同一人。' },
+  hunter:   { name:'猎人',  icon:'🔫', team:'village', skill:'死亡时可开枪带走一名玩家（被毒死时无效）。' },
+  villager: { name:'村民',  icon:'🧑‍🌾',team:'village', skill:'凭智慧在白天找出狼人并投票驱逐。' },
 };
 
-const WOLF_SPEECHES_DAY = [
-  ['我昨晚睡得很好，什么都不知道…', '大家冷静分析，不要乱投。', '我相信预言家会给我们指引。', '这局感觉有些人太可疑了…'],
-  ['我昨晚没有任何特殊行动。', '大家注意观察发言逻辑。', '我觉得我们应该听预言家的。', '谁的发言最奇怪，就先投谁。'],
-  ['我是好人，不需要解释太多。', '现在乱投没意义，要有依据。', '我觉得{0}号发言有问题。', '大家别被狼人带节奏了。'],
-];
-const GOOD_SPEECHES_DAY = [
-  ['我昨晚平安，没发现什么异常。', '大家注意观察狼人的逻辑漏洞。', '投票要慎重，错杀好人对我们不利。', '我支持理性讨论。'],
-  ['昨晚我只是普通村民在睡觉。', '我们需要找出内鬼才能获胜。', '我认为认真分析比乱猜重要。', '有任何线索请说出来。'],
-  ['我没有特殊角色，是普通村民。', '大家互相分析一下今天的局势。', '感觉{0}号的发言有些奇怪？', '我们要团结一致对付狼人。'],
-];
-const NAMES = ['阿明','晓云','大壮','秀英','阿虎','冬梅','老铁','小花','阿飞','建国','翠莲','大刚'];
-const AVATARS = ['👨','👩','👴','👵','🧑','👱','🧔','👲','🧕','👨‍🦱','👩‍🦱','🧒'];
+const CONFIGS = {
+  easy:   { total:6,  wolves:2, seer:1, witch:1, guard:0, hunter:0 },
+  normal: { total:8,  wolves:2, seer:1, witch:1, guard:1, hunter:0 },
+  hard:   { total:10, wolves:3, seer:1, witch:1, guard:1, hunter:1 },
+};
 
-// ===== STATE =====
-let G = {};
+const WOLF_SAYS = [
+  '我昨晚睡得很安稳，什么都不知道。',
+  '大家冷静分析，不要随意乱投票。',
+  '我觉得我们应该多听听预言家的线索。',
+  '感觉有些玩家的发言逻辑很奇怪…',
+  '我是好人，请大家相信我。',
+];
+const GOOD_SAYS = [
+  '昨晚平安，我没有发现任何异常。',
+  '我们要找出逻辑破绽，不能乱投。',
+  '注意观察谁的发言前后矛盾。',
+  '我支持大家理性讨论，找出内鬼。',
+  '团结一致，我们一定能赢！',
+];
+
+const NPC_NAMES   = ['阿明','晓云','大壮','秀英','阿虎','冬梅','老铁','小花','阿飞','建国','翠莲','大刚'];
+const NPC_AVATARS = ['👨','👩','👴','👵','🧑','👱','🧔','👲','🧕','👨‍🦱','👩‍🦱','🧒'];
+
+// ============================================================
+// STATE
+// ============================================================
 let difficulty = 'easy';
+let G = null; // game state, null until started
 
-function setDiff(d) {
-  difficulty = d;
-  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('diff-' + d).classList.add('active');
-}
-
-function buildConfig(diff) {
-  switch(diff) {
-    case 'easy':   return { total:6,  wolves:2, seer:1, witch:1, guard:0, hunter:0 };
-    case 'normal': return { total:8,  wolves:2, seer:1, witch:1, guard:1, hunter:0 };
-    case 'hard':   return { total:10, wolves:3, seer:1, witch:1, guard:1, hunter:1 };
+// ============================================================
+// HELPERS
+// ============================================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
   }
+  return a;
+}
+function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-function initGame() {
-  const cfg = buildConfig(difficulty);
-  const total = cfg.total;
+// ============================================================
+// MODAL (single overlay, used for everything)
+// ============================================================
+function showModal({ icon='', team='', title='', desc='', skill=null, secret=null, night=false, buttons=[] }) {
+  const box = document.getElementById('modal-box');
+  box.className = 'modal-box' + (night ? ' night-mode' : '');
 
-  // Build roles
-  let roles = [];
-  for (let i=0;i<cfg.wolves;i++) roles.push('wolf');
-  roles.push('seer'); roles.push('witch');
-  if (cfg.guard) roles.push('guard');
-  if (cfg.hunter) roles.push('hunter');
-  while (roles.length < total) roles.push('villager');
-  shuffle(roles);
+  document.getElementById('modal-icon').textContent  = icon;
+  document.getElementById('modal-team').textContent  = team;
+  document.getElementById('modal-team').className    = 'modal-team ' + (night ? 'night' : (team.includes('狼') ? 'wolf' : 'village'));
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-title').className   = 'modal-title ' + (night ? 'night' : (team.includes('狼') ? 'wolf' : 'village'));
+  document.getElementById('modal-divider').className = 'modal-divider' + (night ? ' night' : '');
+  document.getElementById('modal-desc').textContent  = desc;
+  document.getElementById('modal-desc').className    = 'modal-desc' + (night ? ' night' : '');
 
-  // Player index for human (random 0..total-1)
-  const humanIdx = Math.floor(Math.random() * total);
-
-  G = {
-    players: [],
-    humanIdx,
-    round: 1,
-    phase: 'night',
-    wolfKill: null,
-    witchSave: false,
-    witchPoison: null,
-    witchUsedSave: false,
-    witchUsedPoison: false,
-    guardProtect: null,
-    guardLastProtect: null,
-    seerResult: null,
-    nightDeaths: [],
-    log: [],
-    selectedTarget: null,
-    hunterPending: null,
-    cfg,
-    nightPhase: 0, // which night step
-    witchPoisoned: false,
-  };
-
-  const usedNames = shuffle([...NAMES]).slice(0, total);
-  const usedAvatars = shuffle([...AVATARS]).slice(0, total);
-
-  for (let i=0;i<total;i++) {
-    G.players.push({
-      id: i, seat: i+1,
-      name: i===humanIdx ? '你' : usedNames[i],
-      avatar: usedAvatars[i],
-      role: roles[i],
-      alive: true,
-      isHuman: i===humanIdx,
-    });
-  }
-
-  fadeTransition(() => {
-    showScreen('s-game');
-    renderPlayers();
-    showRoleReveal();
-  });
-}
-
-function showRoleReveal() {
-  const p = G.players[G.humanIdx];
-  const rd = ROLE_DATA[p.role];
-  document.getElementById('rc-team').textContent = rd.team === 'wolf' ? '· 狼人阵营 ·' : '· 好人阵营 ·';
-  document.getElementById('rc-team').className = 'rc-team ' + rd.team;
-  document.getElementById('rc-icon').textContent = rd.icon;
-  document.getElementById('rc-name').textContent = rd.name;
-  document.getElementById('rc-name').className = 'rc-name ' + rd.color;
-  document.getElementById('rc-desc').textContent = rd.team === 'wolf'
-    ? `你是狼人！潜伏在村庄中，消灭所有好人。`
-    : `你是${rd.name}，运用你的力量帮助村庄找出狼人！`;
-  document.getElementById('rc-skill').innerHTML = `<strong>⚡ 技能：</strong>${rd.skill}`;
-  document.getElementById('role-overlay').style.display = 'flex';
-}
-
-function closeRoleReveal() {
-  document.getElementById('role-overlay').style.display = 'none';
-  beginNight();
-}
-
-// ===== NIGHT PHASE =====
-function beginNight() {
-  G.phase = 'night';
-  G.wolfKill = null;
-  G.witchSave = false;
-  G.witchPoison = null;
-  G.guardProtect = null;
-  G.seerResult = null;
-  G.nightDeaths = [];
-  G.selectedTarget = null;
-  G.nightPhase = 0;
-  G.witchPoisoned = false;
-  updateHeader();
-  runNightPhase();
-}
-
-function runNightPhase() {
-  // Steps: 0=wolves act, 1=seer acts, 2=witch acts, 3=guard acts, 4=resolve
-  const p = G.players[G.humanIdx];
-
-  // Collect night steps
-  const steps = [];
-  steps.push('wolf');
-  if (G.players.some(x=>x.alive&&x.role==='seer')) steps.push('seer');
-  if (G.players.some(x=>x.alive&&x.role==='witch')) steps.push('witch');
-  if (G.players.some(x=>x.alive&&x.role==='guard')) steps.push('guard');
-  steps.push('resolve');
-
-  if (G.nightPhase >= steps.length) { resolveNight(); return; }
-  const step = steps[G.nightPhase];
-
-  if (step === 'wolf') {
-    if (p.alive && p.role === 'wolf') {
-      // Human is wolf - show night overlay, let them pick
-      showNightOverlay('🐺 狼人醒来', `你是狼人。选择一名玩家击杀。\n（你的狼队友知道彼此身份）`, false, () => {
-        document.getElementById('night-overlay').style.display = 'none';
-        renderPlayers(true, [p.id, ...G.players.filter(x=>x.alive&&x.role==='wolf'&&x.id!==G.humanIdx).map(x=>x.id)]);
-        setAction('🐺 狼人击杀', '选择今夜要击杀的目标（不能选自己或狼队友）', [
-          { label:'确认击杀', fn: doWolfKillHuman },
-          { label:'放弃击杀', fn: () => { G.wolfKill=null; advNight(); } }
-        ]);
-      });
-    } else {
-      // AI wolves act
-      aiWolfKill();
-      advNight();
-    }
-  } else if (step === 'seer') {
-    if (p.alive && p.role === 'seer') {
-      renderPlayers(true, [p.id]);
-      setAction('🔮 预言家查验', '选择一名玩家查验其身份（不能选自己）', [
-        { label:'确认查验', fn: doSeerHuman },
-        { label:'跳过', fn: advNight }
-      ]);
-    } else {
-      aiSeer();
-      advNight();
-    }
-  } else if (step === 'witch') {
-    if (p.alive && p.role === 'witch') {
-      doWitchHuman();
-    } else {
-      aiWitch();
-      advNight();
-    }
-  } else if (step === 'guard') {
-    if (p.alive && p.role === 'guard') {
-      renderPlayers(true, [p.id]);
-      setAction('🛡️ 守卫守护', '选择一名玩家进行守护（不能连续守护同一人）', [
-        { label:'确认守护', fn: doGuardHuman },
-        { label:'跳过', fn: advNight }
-      ]);
-    } else {
-      aiGuard();
-      advNight();
-    }
+  const skillEl = document.getElementById('modal-skill');
+  if (skill) {
+    skillEl.style.display = 'block';
+    skillEl.innerHTML = '<strong>⚡ 技能：</strong>' + skill;
+    skillEl.className = 'modal-skill' + (night ? ' night' : '');
   } else {
-    resolveNight();
+    skillEl.style.display = 'none';
   }
-}
 
-function advNight() {
-  G.nightPhase++;
-  setTimeout(runNightPhase, 100);
-}
-
-// AI Actions
-function aiWolfKill() {
-  const wolves = G.players.filter(x=>x.alive&&x.role==='wolf');
-  const targets = G.players.filter(x=>x.alive&&x.role!=='wolf');
-  if (targets.length === 0) return;
-  // Prefer to kill seer/witch/guard if known (simplified: random with weight)
-  const priority = targets.filter(x=>['seer','witch','guard','hunter'].includes(x.role));
-  G.wolfKill = (priority.length>0 && Math.random()<0.5) ? rnd(priority).id : rnd(targets).id;
-}
-
-function aiSeer() {
-  // AI seer checks a random unchecked player
-  const seer = G.players.find(x=>x.alive&&x.role==='seer'&&!x.isHuman);
-  if (!seer) return;
-  const unchecked = G.players.filter(x=>x.alive&&x.id!==seer.id&&!x.seerChecked);
-  if (unchecked.length===0) return;
-  const target = rnd(unchecked);
-  target.seerChecked = true;
-  // seer knows - this doesn't affect UI for player unless player is seer
-}
-
-function aiWitch() {
-  const witch = G.players.find(x=>x.alive&&x.role==='witch'&&!x.isHuman);
-  if (!witch) return;
-  // Use save if wolf killed someone and haven't used save
-  if (!G.witchUsedSave && G.wolfKill!==null && Math.random()<0.7) {
-    G.witchSave = true;
-    G.witchUsedSave = true;
-  } else if (!G.witchUsedPoison && G.round > 1 && Math.random()<0.3) {
-    const targets = G.players.filter(x=>x.alive&&x.id!==witch.id);
-    if (targets.length>0) {
-      const wolves = targets.filter(x=>x.role==='wolf');
-      // Witch doesn't know wolves perfectly - random
-      G.witchPoison = rnd(targets).id;
-      G.witchUsedPoison = true;
-      G.witchPoisoned = true;
-    }
-  }
-}
-
-function aiGuard() {
-  const guard = G.players.find(x=>x.alive&&x.role==='guard'&&!x.isHuman);
-  if (!guard) return;
-  const candidates = G.players.filter(x=>x.alive&&x.id!==G.guardLastProtect);
-  if (candidates.length===0) return;
-  G.guardProtect = rnd(candidates).id;
-  G.guardLastProtect = G.guardProtect;
-}
-
-// Human Actions
-function doWolfKillHuman() {
-  if (G.selectedTarget===null) { flashAction('请先点击一名目标玩家！'); return; }
-  const tgt = G.players[G.selectedTarget];
-  if (!tgt.alive || tgt.role==='wolf') { flashAction('不能选择自己或狼队友！'); return; }
-  G.wolfKill = G.selectedTarget;
-  clearSelection();
-  advNight();
-}
-
-function doSeerHuman() {
-  if (G.selectedTarget===null) { flashAction('请先选择要查验的玩家！'); return; }
-  const tgt = G.players[G.selectedTarget];
-  if (!tgt.alive || tgt.id===G.humanIdx) { flashAction('不能查验自己！'); return; }
-  const isWolf = tgt.role === 'wolf';
-  const result = isWolf ? '🔴 狼人' : '🔵 好人';
-  showNightOverlay('🔮 查验结果',
-    `${tgt.name} 的身份是：`,
-    true,
-    advNight,
-    `${result}`,
-    `${tgt.name}`
-  );
-  clearSelection();
-}
-
-function doWitchHuman() {
-  const killed = G.wolfKill !== null ? G.players[G.wolfKill] : null;
-  const showSave = !G.witchUsedSave && killed;
-  const showPoison = !G.witchUsedPoison;
-  let desc = '';
-  if (killed) desc += `今晚 ${killed.name} 被狼人击杀。`;
-  else desc += '今晚狼人没有击杀任何人。';
-  if (showSave) desc += ` 你可以使用解药救活 ${killed.name}。`;
-  if (showPoison) desc += ' 你可以使用毒药毒杀任意玩家。';
-
-  // Show save/skip first
-  if (showSave) {
-    setAction('⚗️ 女巫行动', desc, [
-      { label:`💊 使用解药救 ${killed.name}`, fn: () => { G.witchSave=true; G.witchUsedSave=true; addSystemLog(`女巫使用解药救了 ${killed.name}`); doWitchPoison(); } },
-      { label:'不使用解药', fn: doWitchPoison },
-    ]);
-    updateSkillRes();
+  const secretEl = document.getElementById('modal-secret');
+  if (secret) {
+    secretEl.style.display = 'block';
+    document.getElementById('modal-secret-label').textContent = secret.label || '';
+    document.getElementById('modal-secret-value').textContent = secret.value || '';
   } else {
-    doWitchPoison();
-  }
-}
-
-function doWitchPoison() {
-  if (G.witchUsedPoison) { advNight(); return; }
-  renderPlayers(true, [G.humanIdx]);
-  setAction('⚗️ 女巫 · 毒药', '可以选择毒杀一名玩家（包括自己外的任意玩家），或不使用毒药。', [
-    { label:'☠️ 使用毒药', fn: () => {
-      if (G.selectedTarget===null) { flashAction('请先选择毒杀目标！'); return; }
-      G.witchPoison = G.selectedTarget; G.witchUsedPoison = true; G.witchPoisoned = true;
-      addSystemLog(`女巫使用毒药...`);
-      clearSelection(); advNight();
-    }},
-    { label:'不使用毒药', fn: advNight },
-  ]);
-  updateSkillRes();
-}
-
-function doGuardHuman() {
-  if (G.selectedTarget===null) { flashAction('请先选择要守护的玩家！'); return; }
-  if (G.selectedTarget===G.guardLastProtect) { flashAction('不能连续两夜守护同一人！'); return; }
-  G.guardProtect = G.selectedTarget;
-  G.guardLastProtect = G.selectedTarget;
-  clearSelection();
-  advNight();
-}
-
-// ===== RESOLVE NIGHT =====
-function resolveNight() {
-  G.nightDeaths = [];
-  const killed = G.wolfKill;
-
-  if (killed !== null) {
-    const savedByWitch = G.witchSave;
-    const savedByGuard = G.guardProtect === killed;
-    if (!savedByWitch && !savedByGuard) {
-      G.nightDeaths.push(killed);
-    }
+    secretEl.style.display = 'none';
   }
 
-  // Witch poison - can die even if guard
-  if (G.witchPoison !== null && !G.nightDeaths.includes(G.witchPoison)) {
-    G.nightDeaths.push(G.witchPoison);
-  }
-
-  G.nightDeaths.forEach(id => G.players[id].alive = false);
-
-  const humanDied = G.nightDeaths.includes(G.humanIdx);
-  const deathNames = G.nightDeaths.map(id => G.players[id].name);
-  const msg = G.nightDeaths.length === 0
-    ? '☀️ 平安夜！今晚没有玩家死亡。'
-    : `☀️ 黎明来临。${deathNames.join('、')} 倒在了黑夜之中。`;
-
-  addSystemLog(msg);
-
-  // Check hunter night death
-  const nightHunter = G.nightDeaths.find(id => G.players[id].role==='hunter');
-  // Hunter can't shoot if poisoned
-  const hunterPoisoned = nightHunter !== undefined && G.witchPoison === nightHunter && G.witchPoisoned;
-
-  if (checkWin()) return;
-
-  if (nightHunter !== undefined && !hunterPoisoned) {
-    G.hunterPending = nightHunter;
-    beginDay(msg, true);
-  } else {
-    beginDay(msg, false);
-  }
-}
-
-// ===== DAY PHASE =====
-function beginDay(dawnMsg, hasHunter) {
-  G.phase = 'day';
-  G.selectedTarget = null;
-  updateHeader();
-  renderPlayers();
-  clearAction();
-
-  // Show dawn system message
-  addSystemLog(`━━━━ 第 ${G.round} 天 ━━━━`);
-
-  // AI speeches
-  setTimeout(() => runDayDiscussion(hasHunter), 300);
-}
-
-function runDayDiscussion(hasHunter) {
-  const human = G.players[G.humanIdx];
-  const alivePlayers = G.players.filter(p=>p.alive&&!p.isHuman);
-  let delay = 0;
-
-  alivePlayers.forEach(p => {
-    delay += 800 + Math.random()*600;
-    setTimeout(() => {
-      const speeches = p.role==='wolf' ? WOLF_SPEECHES_DAY : GOOD_SPEECHES_DAY;
-      const pool = rnd(speeches);
-      let speech = rnd(pool);
-      // Fill in template
-      const others = G.players.filter(x=>x.alive&&x.id!==p.id);
-      if (others.length>0) speech = speech.replace('{0}', rnd(others).seat);
-      addSpeech(p, speech);
-    }, delay);
+  const btnsEl = document.getElementById('modal-btns');
+  btnsEl.innerHTML = '';
+  buttons.forEach(({ text, gold, fn }) => {
+    const btn = document.createElement('button');
+    btn.className = 'ink-btn' + (gold ? ' gold' : '');
+    btn.textContent = text;
+    btn.addEventListener('click', fn);
+    btnsEl.appendChild(btn);
   });
 
-  // After all speeches, show action to human
-  delay += 600;
-  setTimeout(() => {
-    if (hasHunter) {
-      handleHunter(G.hunterPending, false);
-    } else {
-      if (human.alive) showVoteAction();
-      else watchVote();
-    }
-  }, delay);
+  document.getElementById('modal-overlay').classList.add('open');
 }
 
-function showVoteAction() {
-  renderPlayers(true, [G.humanIdx]);
-  setAction('⚔️ 白天投票', '发表意见后，选择一名玩家进行投票驱逐。票数最高者出局。', [
-    { label:'投票驱逐', fn: doVoteHuman },
-    { label:'弃票', fn: () => { addSpeech(G.players[G.humanIdx], '我选择弃票。'); doAIVotes(); }},
-  ]);
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
 }
 
-function watchVote() {
-  setAction('💀 你已死亡', '你只能旁观本局游戏...', []);
-  doAIVotes();
-}
-
-function doVoteHuman() {
-  if (G.selectedTarget===null) { flashAction('请先选择投票目标！'); return; }
-  const tgt = G.players[G.selectedTarget];
-  if (!tgt.alive) { flashAction('该玩家已出局！'); return; }
-  addSpeech(G.players[G.humanIdx], `我投票驱逐 ${tgt.seat}号 ${tgt.name}！`);
-  clearSelection();
-  doAIVotes(G.selectedTarget);
-}
-
-function doAIVotes(humanVote) {
-  // Collect AI votes
-  const alive = G.players.filter(p=>p.alive);
-  const voteMap = {};
-  alive.forEach(p=>{
-    let tgt;
-    if (p.isHuman) {
-      if (humanVote!==undefined) tgt=humanVote; else return;
-    } else if (p.role==='wolf') {
-      // Wolves vote for non-wolves, prefer key roles
-      const good = G.players.filter(x=>x.alive&&x.role!=='wolf'&&x.id!==p.id);
-      if (!good.length) return;
-      tgt = rnd(good).id;
-    } else {
-      // Good AI votes for wolves sometimes, or random
-      const suspects = G.players.filter(x=>x.alive&&x.id!==p.id);
-      if (!suspects.length) return;
-      // 40% chance to correctly vote wolf
-      const wolves = suspects.filter(x=>x.role==='wolf');
-      tgt = (wolves.length>0&&Math.random()<0.4) ? rnd(wolves).id : rnd(suspects).id;
-    }
-    voteMap[tgt] = (voteMap[tgt]||0)+1;
-  });
-
-  // AI speech votes
-  let delay = 0;
-  G.players.filter(p=>p.alive&&!p.isHuman).forEach(p => {
-    if (voteMap[p.id]!==undefined || true) {
-      delay += 400;
-      setTimeout(()=>{
-        // Find who this player voted for
-        // (simplified: just show generic)
-      }, delay);
-    }
-  });
-
-  // Find result
-  let maxVotes=0, maxId=null, tie=false;
-  Object.entries(voteMap).forEach(([id,v])=>{
-    if (v>maxVotes){maxVotes=v;maxId=parseInt(id);tie=false;}
-    else if(v===maxVotes){tie=true;}
-  });
-
-  setTimeout(()=>{
-    if (tie||maxId===null) {
-      addSystemLog('⚖️ 投票平局！今天没有人出局。');
-      endDay();
-    } else {
-      const exiled = G.players[maxId];
-      exiled.alive = false;
-      const rd = ROLE_DATA[exiled.role];
-      addSystemLog(`🗳️ ${exiled.name} 被投票驱逐！身份揭示：${rd.icon} ${rd.name}`);
-      renderPlayers();
-
-      if (checkWin()) return;
-
-      // Hunter on exile?
-      if (exiled.role==='hunter' && !G.witchPoisoned) {
-        G.hunterPending = exiled.id;
-        handleHunter(exiled.id, true);
-      } else {
-        endDay();
-      }
-    }
-  }, delay + 600);
-}
-
-function handleHunter(hunterId, afterVote) {
-  const hunter = G.players[hunterId];
-  const isHuman = hunter.isHuman;
-  addSystemLog(`🔫 猎人 ${hunter.name} 死亡时可开枪带走一名玩家！`);
-
-  if (isHuman && G.players[G.humanIdx].alive===false) {
-    // Human hunter died
-    renderPlayers(true, [hunterId]);
-    setAction('🔫 猎人技能', '你死亡了！可以开枪带走一名玩家。', [
-      { label:'开枪', fn: () => {
-        if (G.selectedTarget===null){flashAction('请选择目标！');return;}
-        const tgt=G.players[G.selectedTarget];
-        tgt.alive=false;
-        addSystemLog(`🔫 猎人 ${hunter.name} 开枪带走了 ${tgt.name}（${ROLE_DATA[tgt.role].name}${ROLE_DATA[tgt.role].icon}）`);
-        renderPlayers();
-        if(checkWin())return;
-        endDay();
-      }},
-      { label:'不开枪', fn: endDay }
-    ]);
-  } else {
-    // AI hunter
-    const targets = G.players.filter(p=>p.alive&&p.id!==hunterId);
-    if (targets.length>0) {
-      const tgt = rnd(targets);
-      tgt.alive = false;
-      addSystemLog(`🔫 猎人 ${hunter.name} 开枪带走了 ${tgt.name}（${ROLE_DATA[tgt.role].name}）`);
-      renderPlayers();
-      if(checkWin())return;
-    }
-    endDay();
-  }
-}
-
-function endDay() {
-  G.round++;
-  G.hunterPending = null;
-  clearAction();
-  setTimeout(beginNight, 500);
-}
-
-// ===== WIN CHECK =====
-function checkWin() {
-  const wolves = G.players.filter(p=>p.alive&&p.role==='wolf').length;
-  const good   = G.players.filter(p=>p.alive&&p.role!=='wolf').length;
-  if (wolves===0) { showWin('village'); return true; }
-  if (wolves>=good){ showWin('wolf'); return true; }
-  return false;
-}
-
-function showWin(winner) {
-  const human = G.players[G.humanIdx];
-  const humanWon = (winner==='wolf') === (human.role==='wolf');
-  const ws = document.getElementById('win-screen');
-  ws.className = 'win-screen ' + (winner==='wolf' ? 'wolf-win' : 'village-win');
-  document.getElementById('win-icon').textContent = winner==='wolf'?'🐺':'🌅';
-  document.getElementById('win-title').textContent = winner==='wolf'?'狼人获胜！':'村民获胜！';
-  document.getElementById('win-sub').textContent = humanWon
-    ? '🎉 恭喜你！你赢得了这一局！' : '😢 很遗憾，这一局你失败了...';
-
-  const list = document.getElementById('reveal-list');
-  list.innerHTML = '';
-  G.players.forEach(p=>{
-    const rd=ROLE_DATA[p.role];
-    const chip=document.createElement('div');
-    chip.className='reveal-chip';
-    chip.textContent=`${p.alive?'✅':'❌'} ${p.name} · ${rd.name}${rd.icon}`;
-    list.appendChild(chip);
-  });
-  ws.style.display='flex';
-}
-
-// ===== RENDER =====
-function renderPlayers(selectable, excludeIds) {
+// ============================================================
+// RENDER PLAYERS
+// ============================================================
+function renderPlayers(selectableFilter) {
+  // selectableFilter: fn(player) => bool, or null for no selection
   const ring = document.getElementById('players-ring');
   ring.innerHTML = '';
-  G.players.forEach(p=>{
-    const rd = ROLE_DATA[p.role];
+  G.players.forEach(p => {
+    const rd = ROLES[p.role];
     const div = document.createElement('div');
-    let cls = 'player-card';
-    if (p.isHuman) cls += ' is-you';
-    if (!p.alive) cls += ' dead';
-    if (selectable && p.alive && !(excludeIds||[]).includes(p.id)) cls += ' selectable';
-    if (G.selectedTarget===p.id) cls += ' selected';
-    div.className = cls;
-    div.id = 'pc-'+p.id;
 
+    const canSelect = selectableFilter && p.alive && selectableFilter(p);
+    const isSelected = G.selectedId === p.id;
+
+    let cls = 'player-card';
+    if (p.isHuman)  cls += ' is-you';
+    if (!p.alive)   cls += ' dead';
+    if (canSelect)  cls += ' selectable';
+    if (isSelected) cls += ' selected';
+    div.className = cls;
+
+    // Show role only for human or dead
     const showRole = p.isHuman || !p.alive;
+
     div.innerHTML = `
       ${p.isHuman ? '<div class="you-badge">你</div>' : ''}
       <div class="pc-seat">${p.seat}号</div>
       <div class="pc-avatar">${p.avatar}</div>
       <div class="pc-name">${p.name}</div>
-      ${showRole ? `<div class="pc-role-tag ${rd.team}">${rd.icon}${rd.name}</div>` : ''}
+      ${showRole ? `<div class="pc-role ${rd.team}">${rd.icon}${rd.name}</div>` : ''}
+      ${!p.alive ? '<div class="death-mark">†</div>' : ''}
     `;
 
-    if (selectable && p.alive && !(excludeIds||[]).includes(p.id)) {
-      div.onclick = () => {
-        G.selectedTarget = p.id;
-        renderPlayers(selectable, excludeIds);
-        const info = document.getElementById('action-desc');
-        if (info) info.innerHTML = info.innerHTML.replace(/已选择.*？。|/, '') + `<br><strong>已选择：${p.seat}号 ${p.name}</strong>`;
-      };
+    if (canSelect) {
+      div.addEventListener('click', () => {
+        G.selectedId = p.id;
+        renderPlayers(selectableFilter);
+      });
     }
     ring.appendChild(div);
   });
 }
 
+// ============================================================
+// SPEECH LOG
+// ============================================================
 function addSpeech(player, text) {
   const log = document.getElementById('speech-log');
-  const isHuman = player.isHuman;
-  const isWolf = player.role==='wolf';
-  const rd = ROLE_DATA[player.role];
-
   const div = document.createElement('div');
-  div.className = `speech-item ${isHuman?'right':''} ${isWolf&&!player.alive?'wolf-talk':''}`;
+  div.className = 'speech-item' + (player.isHuman ? ' right' : '');
   div.innerHTML = `
-    ${!isHuman?`<div class="speech-avatar-sm">${player.avatar}</div>`:''}
+    ${!player.isHuman ? `<div class="speech-avatar-sm">${player.avatar}</div>` : ''}
     <div class="bubble">
       <div class="bubble-name">${player.seat}号 ${player.name}</div>
       ${text}
     </div>
-    ${isHuman?`<div class="speech-avatar-sm">${player.avatar}</div>`:''}
+    ${player.isHuman ? `<div class="speech-avatar-sm">${player.avatar}</div>` : ''}
   `;
   log.appendChild(div);
   log.scrollTop = log.scrollHeight;
 }
 
-function addSystemLog(msg) {
+function addSystem(text) {
   const log = document.getElementById('speech-log');
   const div = document.createElement('div');
   div.className = 'speech-item system';
-  div.innerHTML = `<div class="bubble">${msg}</div>`;
+  div.innerHTML = `<div class="bubble">${text}</div>`;
   log.appendChild(div);
   log.scrollTop = log.scrollHeight;
 }
 
-function setAction(title, desc, btns) {
+// ============================================================
+// ACTION PANEL
+// ============================================================
+function setAction({ title='', skill=null, desc='', buttons=[] }) {
   document.getElementById('action-title').textContent = '◈ ' + title;
-  document.getElementById('action-desc').textContent = desc;
-  const row = document.getElementById('action-btns');
-  row.innerHTML = '';
-  btns.forEach(b=>{
-    const el=document.createElement('button');
-    el.className = 'ink-btn';
-    el.textContent = b.label;
-    el.onclick = b.fn;
-    row.appendChild(el);
+  document.getElementById('action-desc').textContent  = desc;
+
+  const skillRes = document.getElementById('skill-res');
+  if (skill) {
+    skillRes.style.display = 'flex';
+    skillRes.innerHTML = skill;
+  } else {
+    skillRes.style.display = 'none';
+    skillRes.innerHTML = '';
+  }
+
+  const btns = document.getElementById('action-btns');
+  btns.innerHTML = '';
+  buttons.forEach(({ text, gold, fn }) => {
+    const btn = document.createElement('button');
+    btn.className = 'ink-btn' + (gold ? ' gold' : '');
+    btn.textContent = text;
+    btn.addEventListener('click', fn);
+    btns.appendChild(btn);
   });
 }
 
 function clearAction() {
-  document.getElementById('action-title').textContent = '◈ 等待中';
-  document.getElementById('action-desc').textContent = '';
-  document.getElementById('action-btns').innerHTML = '';
-  renderPlayers();
+  setAction({ title:'等待中', desc:'', buttons:[] });
+  renderPlayers(null);
 }
 
-function flashAction(msg) {
-  const desc = document.getElementById('action-desc');
-  const old = desc.textContent;
-  desc.style.color = '#c0392b';
-  desc.textContent = '⚠️ ' + msg;
-  setTimeout(()=>{ desc.style.color=''; desc.textContent=old; }, 1800);
-}
-
-function clearSelection() {
-  G.selectedTarget = null;
-}
-
-function updateSkillRes() {
-  const human = G.players[G.humanIdx];
-  if (human.role !== 'witch') return;
-  const el = document.getElementById('skill-res');
-  el.style.display='flex';
-  el.innerHTML = `
-    <div class="skill-pip ${G.witchUsedSave?'used':''}">💊解药 ${G.witchUsedSave?'已用':'×1'}</div>
-    <div class="skill-pip ${G.witchUsedPoison?'used':''}">☠️毒药 ${G.witchUsedPoison?'已用':'×1'}</div>
-  `;
+function flashDesc(msg) {
+  const el = document.getElementById('action-desc');
+  const old = el.textContent;
+  el.style.color = '#c0392b';
+  el.textContent = '⚠️ ' + msg;
+  setTimeout(() => { el.style.color = ''; el.textContent = old; }, 1800);
 }
 
 function updateHeader() {
   const ind = document.getElementById('phase-indicator');
   const badge = document.getElementById('round-badge');
-  if (G.phase==='night') {
+  if (G.phase === 'night') {
     ind.textContent = '🌑 黑夜';
     ind.className = 'phase-indicator night';
     badge.textContent = `第 ${G.round} 夜`;
@@ -1284,60 +614,679 @@ function updateHeader() {
   }
 }
 
-// ===== NIGHT OVERLAY =====
-let nightOverlayCb = null;
-function showNightOverlay(title, msg, showSecret, cb, secretVal, secretLabel) {
-  document.getElementById('night-overlay-title').textContent = title;
-  document.getElementById('night-overlay-msg').textContent = msg;
-  const secretBox = document.getElementById('night-secret-box');
-  if (showSecret) {
-    secretBox.style.display='block';
-    document.getElementById('night-secret-label').textContent = secretLabel||'结果';
-    document.getElementById('night-secret-value').textContent = secretVal||'';
+// ============================================================
+// INIT GAME
+// ============================================================
+function initGame() {
+  const cfg = CONFIGS[difficulty];
+  const total = cfg.total;
+
+  let roles = [];
+  for (let i = 0; i < cfg.wolves; i++) roles.push('wolf');
+  roles.push('seer');
+  roles.push('witch');
+  if (cfg.guard)  roles.push('guard');
+  if (cfg.hunter) roles.push('hunter');
+  while (roles.length < total) roles.push('villager');
+  roles = shuffle(roles);
+
+  const humanIdx = Math.floor(Math.random() * total);
+  const names    = shuffle([...NPC_NAMES]).slice(0, total);
+  const avatars  = shuffle([...NPC_AVATARS]).slice(0, total);
+
+  G = {
+    players: [],
+    humanIdx,
+    round: 1,
+    phase: 'night',
+    // Night state (reset each night)
+    wolfKill: null,
+    witchSave: false,
+    witchPoison: null,
+    witchPoisonedTarget: false, // witch used poison (for hunter check)
+    guardProtect: null,
+    guardLastProtect: null,
+    // Persistent witch resources
+    witchUsedSave: false,
+    witchUsedPoison: false,
+    // UI
+    selectedId: null,
+  };
+
+  for (let i = 0; i < total; i++) {
+    G.players.push({
+      id: i, seat: i + 1,
+      name: i === humanIdx ? '你' : names[i],
+      avatar: avatars[i],
+      role: roles[i],
+      alive: true,
+      isHuman: i === humanIdx,
+    });
+  }
+
+  document.getElementById('speech-log').innerHTML = '';
+  showScreen('s-game');
+  updateHeader();
+  renderPlayers(null);
+
+  // Show role card once
+  showRoleCard();
+}
+
+// ============================================================
+// ROLE REVEAL (shown once at game start)
+// ============================================================
+function showRoleCard() {
+  const human = G.players[G.humanIdx];
+  const rd = ROLES[human.role];
+  const isWolf = rd.team === 'wolf';
+
+  showModal({
+    icon: rd.icon,
+    team: isWolf ? '· 狼人阵营 ·' : '· 好人阵营 ·',
+    title: rd.name,
+    desc: isWolf
+      ? '你是狼人！潜伏在村庄中，消灭所有好人。'
+      : `你是${rd.name}，运用你的力量帮助村庄找出狼人！`,
+    skill: rd.skill,
+    night: false,
+    buttons: [{
+      text: '我已知晓，进入游戏', gold: true,
+      fn: () => { closeModal(); beginNight(); }
+    }]
+  });
+}
+
+// ============================================================
+// NIGHT PHASE
+// ============================================================
+function beginNight() {
+  G.phase = 'night';
+  G.wolfKill = null;
+  G.witchSave = false;
+  G.witchPoison = null;
+  G.witchPoisonedTarget = false;
+  G.guardProtect = null;
+  G.selectedId = null;
+  updateHeader();
+  clearAction();
+  addSystem(`━━━━ 第 ${G.round} 夜 ━━━━`);
+
+  // Build the sequence of night actions for this round
+  const steps = buildNightSteps();
+  runNightStep(steps, 0);
+}
+
+function buildNightSteps() {
+  const steps = [];
+  // Wolves always act
+  steps.push('wolf');
+  // Only add steps if that role is alive
+  if (G.players.some(p => p.alive && p.role === 'seer'))  steps.push('seer');
+  if (G.players.some(p => p.alive && p.role === 'witch'))  steps.push('witch');
+  if (G.players.some(p => p.alive && p.role === 'guard'))  steps.push('guard');
+  return steps;
+}
+
+function runNightStep(steps, idx) {
+  // All steps done → resolve
+  if (idx >= steps.length) {
+    resolveNight();
+    return;
+  }
+
+  const step = steps[idx];
+  const next = () => runNightStep(steps, idx + 1);
+  const human = G.players[G.humanIdx];
+
+  if (step === 'wolf') {
+    if (human.alive && human.role === 'wolf') {
+      nightWolfHuman(next);
+    } else {
+      aiWolfKill();
+      next();
+    }
+
+  } else if (step === 'seer') {
+    if (human.alive && human.role === 'seer') {
+      nightSeerHuman(next);
+    } else {
+      aiSeer();
+      next();
+    }
+
+  } else if (step === 'witch') {
+    if (human.alive && human.role === 'witch') {
+      nightWitchHuman(next);
+    } else {
+      aiWitch();
+      next();
+    }
+
+  } else if (step === 'guard') {
+    if (human.alive && human.role === 'guard') {
+      nightGuardHuman(next);
+    } else {
+      aiGuard();
+      next();
+    }
+  }
+}
+
+// ---- Wolf (human) ----
+function nightWolfHuman(next) {
+  const human = G.players[G.humanIdx];
+  const wolfTeam = G.players.filter(p => p.role === 'wolf').map(p => p.id);
+
+  showModal({
+    icon: '🐺', team: '· 狼人行动 ·', title: '黑夜降临',
+    desc: '你是狼人。关闭此窗口后，请选择今晚要击杀的目标。',
+    night: true,
+    buttons: [{
+      text: '好的', fn: () => {
+        closeModal();
+        G.selectedId = null;
+        // Exclude self + wolf teammates from selection
+        renderPlayers(p => !wolfTeam.includes(p.id));
+        setAction({
+          title: '🐺 狼人击杀',
+          desc: '请选择今晚要击杀的目标（不能选自己或狼队友）',
+          buttons: [
+            { text: '确认击杀', fn: () => {
+              if (G.selectedId === null) { flashDesc('请先点击一名目标玩家'); return; }
+              G.wolfKill = G.selectedId;
+              G.selectedId = null;
+              clearAction();
+              next();
+            }},
+            { text: '放弃击杀', fn: () => {
+              G.wolfKill = null;
+              G.selectedId = null;
+              clearAction();
+              next();
+            }},
+          ]
+        });
+      }
+    }]
+  });
+}
+
+// ---- Seer (human) ----
+function nightSeerHuman(next) {
+  const human = G.players[G.humanIdx];
+
+  showModal({
+    icon: '🔮', team: '· 预言家行动 ·', title: '神秘感应',
+    desc: '关闭后请选择一名玩家查验其身份。',
+    night: true,
+    buttons: [{
+      text: '好的', fn: () => {
+        closeModal();
+        G.selectedId = null;
+        renderPlayers(p => p.id !== human.id);
+        setAction({
+          title: '🔮 预言家查验',
+          desc: '请选择一名玩家查验其身份（不能选自己）',
+          buttons: [
+            { text: '确认查验', fn: () => {
+              if (G.selectedId === null) { flashDesc('请先选择要查验的玩家'); return; }
+              const target = G.players[G.selectedId];
+              const isWolf = target.role === 'wolf';
+              const resultText = isWolf ? '🔴 狼人' : '🔵 好人';
+              G.selectedId = null;
+              clearAction();
+              // Show result in a modal, then continue
+              showModal({
+                icon: '🔮', team: '查验结果', title: '天眼揭示',
+                night: true,
+                desc: `${target.seat}号 ${target.name} 的身份是：`,
+                secret: { label: target.name, value: resultText },
+                buttons: [{
+                  text: '收到，关闭', fn: () => { closeModal(); next(); }
+                }]
+              });
+            }},
+            { text: '跳过', fn: () => {
+              G.selectedId = null;
+              clearAction();
+              next();
+            }},
+          ]
+        });
+      }
+    }]
+  });
+}
+
+// ---- Witch (human) ----
+function nightWitchHuman(next) {
+  const killed = G.wolfKill !== null ? G.players[G.wolfKill] : null;
+  const canSave   = !G.witchUsedSave && killed !== null;
+  const canPoison = !G.witchUsedPoison;
+
+  const skillHtml = `
+    <div class="skill-pip ${G.witchUsedSave ? 'used' : ''}">💊解药 ${G.witchUsedSave ? '已用' : '×1'}</div>
+    <div class="skill-pip ${G.witchUsedPoison ? 'used' : ''}">☠️毒药 ${G.witchUsedPoison ? '已用' : '×1'}</div>
+  `;
+
+  let descText = killed
+    ? `今晚 ${killed.name} 被狼人击杀。`
+    : '今晚狼人没有击杀任何人。';
+  if (canSave)   descText += ` 你可以使用解药救活 ${killed.name}。`;
+  if (canPoison) descText += ' 你可以使用毒药毒杀任意玩家。';
+  if (!canSave && !canPoison) descText += ' 你的药水已耗尽。';
+
+  const buttons = [];
+  if (canSave) {
+    buttons.push({ text: `💊 救 ${killed.name}`, fn: () => {
+      G.witchSave = true;
+      G.witchUsedSave = true;
+      addSystem(`女巫使用解药救了 ${killed.name}`);
+      closeModal();
+      // After save, check if can still poison
+      if (!G.witchUsedPoison) {
+        nightWitchPoison(next);
+      } else {
+        clearAction();
+        next();
+      }
+    }});
+  }
+  if (canPoison) {
+    buttons.push({ text: '☠️ 使用毒药', fn: () => {
+      closeModal();
+      nightWitchPoison(next);
+    }});
+  }
+  buttons.push({ text: '什么都不做', fn: () => {
+    closeModal();
+    clearAction();
+    next();
+  }});
+
+  showModal({
+    icon: '⚗️', team: '· 女巫行动 ·', title: '药剂时刻',
+    desc: descText, skill: skillHtml, night: true,
+    buttons
+  });
+}
+
+function nightWitchPoison(next) {
+  const human = G.players[G.humanIdx];
+  G.selectedId = null;
+  renderPlayers(p => p.id !== human.id);
+  setAction({
+    title: '⚗️ 女巫 · 毒药',
+    skill: `<div class="skill-pip">☠️毒药 ×1</div>`,
+    desc: '选择一名玩家使用毒药（或跳过不用）',
+    buttons: [
+      { text: '确认毒杀', fn: () => {
+        if (G.selectedId === null) { flashDesc('请先选择毒杀目标'); return; }
+        G.witchPoison = G.selectedId;
+        G.witchUsedPoison = true;
+        G.witchPoisonedTarget = true;
+        addSystem(`女巫使用了毒药…`);
+        G.selectedId = null;
+        clearAction();
+        next();
+      }},
+      { text: '不用毒药', fn: () => {
+        G.selectedId = null;
+        clearAction();
+        next();
+      }},
+    ]
+  });
+}
+
+// ---- Guard (human) ----
+function nightGuardHuman(next) {
+  const human = G.players[G.humanIdx];
+
+  showModal({
+    icon: '🛡️', team: '· 守卫行动 ·', title: '守夜',
+    desc: '关闭后请选择一名玩家进行守护（不可连续守护同一人）。',
+    night: true,
+    buttons: [{
+      text: '好的', fn: () => {
+        closeModal();
+        G.selectedId = null;
+        renderPlayers(p => p.id !== human.id);
+        setAction({
+          title: '🛡️ 守卫守护',
+          desc: '请选择要守护的玩家（不可连续守护同一人）',
+          buttons: [
+            { text: '确认守护', fn: () => {
+              if (G.selectedId === null) { flashDesc('请先选择要守护的玩家'); return; }
+              if (G.selectedId === G.guardLastProtect) { flashDesc('不能连续两夜守护同一人！'); return; }
+              G.guardProtect = G.selectedId;
+              G.guardLastProtect = G.selectedId;
+              G.selectedId = null;
+              clearAction();
+              next();
+            }},
+            { text: '跳过', fn: () => {
+              G.selectedId = null;
+              clearAction();
+              next();
+            }},
+          ]
+        });
+      }
+    }]
+  });
+}
+
+// ---- AI Actions ----
+function aiWolfKill() {
+  const targets = G.players.filter(p => p.alive && p.role !== 'wolf');
+  if (!targets.length) return;
+  // Prefer key roles
+  const priority = targets.filter(p => ['seer','witch','guard','hunter'].includes(p.role));
+  G.wolfKill = (priority.length > 0 && Math.random() < 0.55)
+    ? rnd(priority).id : rnd(targets).id;
+}
+
+function aiSeer() {
+  const seer = G.players.find(p => p.alive && p.role === 'seer' && !p.isHuman);
+  if (!seer) return;
+  // AI seer just checks someone - no visible effect for player
+}
+
+function aiWitch() {
+  const witch = G.players.find(p => p.alive && p.role === 'witch' && !p.isHuman);
+  if (!witch) return;
+  if (!G.witchUsedSave && G.wolfKill !== null && Math.random() < 0.65) {
+    G.witchSave = true;
+    G.witchUsedSave = true;
+  } else if (!G.witchUsedPoison && G.round > 1 && Math.random() < 0.25) {
+    const targets = G.players.filter(p => p.alive && p.id !== witch.id);
+    if (targets.length) {
+      G.witchPoison = rnd(targets).id;
+      G.witchUsedPoison = true;
+      G.witchPoisonedTarget = true;
+    }
+  }
+}
+
+function aiGuard() {
+  const guard = G.players.find(p => p.alive && p.role === 'guard' && !p.isHuman);
+  if (!guard) return;
+  const targets = G.players.filter(p => p.alive && p.id !== G.guardLastProtect);
+  if (!targets.length) return;
+  G.guardProtect = rnd(targets).id;
+  G.guardLastProtect = G.guardProtect;
+}
+
+// ============================================================
+// RESOLVE NIGHT
+// ============================================================
+function resolveNight() {
+  const deaths = [];
+
+  // Wolf kill - check guard + witch save
+  if (G.wolfKill !== null) {
+    const guardSaved = G.guardProtect === G.wolfKill;
+    const witchSaved = G.witchSave;
+    if (!guardSaved && !witchSaved) deaths.push(G.wolfKill);
+  }
+
+  // Witch poison (not blocked by guard)
+  if (G.witchPoison !== null && !deaths.includes(G.witchPoison)) {
+    deaths.push(G.witchPoison);
+  }
+
+  deaths.forEach(id => { G.players[id].alive = false; });
+
+  const deathNames = deaths.map(id => G.players[id].name);
+  const msg = deaths.length === 0
+    ? '☀️ 平安夜！今晚没有玩家死亡。'
+    : `☀️ 黎明来临。${deathNames.join('、')} 倒在了黑夜之中。`;
+  addSystem(msg);
+
+  if (checkWin()) return;
+
+  // Hunter night death (not if poisoned)
+  const nightHunter = deaths.find(id => {
+    return G.players[id].role === 'hunter' && G.witchPoison !== id;
+  });
+
+  renderPlayers(null);
+
+  if (nightHunter !== undefined) {
+    handleHunter(nightHunter, () => beginDay());
   } else {
-    secretBox.style.display='none';
+    beginDay();
   }
-  nightOverlayCb = cb;
-  document.getElementById('night-overlay').style.display='flex';
 }
 
-function nightOverlayNext() {
-  document.getElementById('night-overlay').style.display='none';
-  if (nightOverlayCb) nightOverlayCb();
-  nightOverlayCb = null;
+// ============================================================
+// DAY PHASE
+// ============================================================
+function beginDay() {
+  G.phase = 'day';
+  G.selectedId = null;
+  updateHeader();
+  clearAction();
+  addSystem(`━━━━ 第 ${G.round} 天 ━━━━`);
+
+  // AI speeches with delay
+  const alive = G.players.filter(p => p.alive && !p.isHuman);
+  let delay = 0;
+  alive.forEach(p => {
+    delay += 700 + Math.random() * 500;
+    setTimeout(() => {
+      const pool = p.role === 'wolf' ? WOLF_SAYS : GOOD_SAYS;
+      addSpeech(p, rnd(pool));
+    }, delay);
+  });
+
+  setTimeout(() => {
+    const human = G.players[G.humanIdx];
+    if (human.alive) {
+      showVoteAction();
+    } else {
+      addSystem('你已死亡，只能旁观本局…');
+      doAIVotes(null);
+    }
+  }, delay + 500);
 }
 
-// ===== HELPERS =====
-function shuffle(arr) {
-  for(let i=arr.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
+function showVoteAction() {
+  const human = G.players[G.humanIdx];
+  G.selectedId = null;
+  renderPlayers(p => p.id !== human.id);
+  setAction({
+    title: '⚔️ 白天投票',
+    desc: '请选择一名玩家投票驱逐，或弃票。',
+    buttons: [
+      { text: '投票驱逐', gold: true, fn: () => {
+        if (G.selectedId === null) { flashDesc('请先选择投票目标'); return; }
+        const tgt = G.players[G.selectedId];
+        addSpeech(human, `我投票驱逐 ${tgt.seat}号 ${tgt.name}！`);
+        const humanVote = G.selectedId;
+        G.selectedId = null;
+        clearAction();
+        doAIVotes(humanVote);
+      }},
+      { text: '弃票', fn: () => {
+        addSpeech(human, '我选择弃票。');
+        G.selectedId = null;
+        clearAction();
+        doAIVotes(null);
+      }},
+    ]
+  });
+}
+
+function doAIVotes(humanVote) {
+  // Collect votes
+  const voteMap = {};
+  G.players.filter(p => p.alive).forEach(p => {
+    let tgtId = null;
+    if (p.isHuman) {
+      tgtId = humanVote; // may be null if abstain
+    } else if (p.role === 'wolf') {
+      const good = G.players.filter(x => x.alive && x.role !== 'wolf');
+      if (good.length) tgtId = rnd(good).id;
+    } else {
+      const others = G.players.filter(x => x.alive && x.id !== p.id);
+      if (!others.length) return;
+      const wolves = others.filter(x => x.role === 'wolf');
+      tgtId = (wolves.length > 0 && Math.random() < 0.4) ? rnd(wolves).id : rnd(others).id;
+    }
+    if (tgtId !== null) voteMap[tgtId] = (voteMap[tgtId] || 0) + 1;
+  });
+
+  // Find winner
+  let maxV = 0, maxId = null, tie = false;
+  Object.entries(voteMap).forEach(([id, v]) => {
+    const n = parseInt(id);
+    if (v > maxV) { maxV = v; maxId = n; tie = false; }
+    else if (v === maxV) { tie = true; }
+  });
+
+  // Show vote result
+  if (tie || maxId === null) {
+    addSystem('⚖️ 投票平局！今天没有人出局。');
+    endDay();
+    return;
   }
-  return arr;
-}
-function rnd(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const exiled = G.players[maxId];
+  exiled.alive = false;
+  renderPlayers(null);
+
+  const rd = ROLES[exiled.role];
+  addSystem(`🗳️ ${exiled.name} 被投票出局！身份揭示：${rd.icon} ${rd.name}`);
+
+  if (checkWin()) return;
+
+  if (exiled.role === 'hunter' && G.witchPoison !== exiled.id) {
+    handleHunter(exiled.id, () => endDay());
+  } else {
+    endDay();
+  }
 }
 
-function fadeTransition(cb) {
-  const overlay = document.getElementById('fade-overlay');
-  overlay.classList.add('show');
-  setTimeout(()=>{ cb(); overlay.classList.remove('show'); }, 400);
+// ============================================================
+// HUNTER
+// ============================================================
+function handleHunter(hunterId, onDone) {
+  const hunter = G.players[hunterId];
+  addSystem(`🔫 猎人 ${hunter.name} 死亡，可以开枪带走一名玩家！`);
+
+  if (hunter.isHuman) {
+    G.selectedId = null;
+    renderPlayers(p => p.id !== hunterId);
+    setAction({
+      title: '🔫 猎人开枪',
+      desc: '你死亡了，可以开枪带走一名玩家，或选择不开枪。',
+      buttons: [
+        { text: '开枪', fn: () => {
+          if (G.selectedId === null) { flashDesc('请先选择目标'); return; }
+          const tgt = G.players[G.selectedId];
+          tgt.alive = false;
+          renderPlayers(null);
+          addSystem(`🔫 猎人 ${hunter.name} 开枪带走了 ${tgt.name}（${ROLES[tgt.role].name}）`);
+          G.selectedId = null;
+          clearAction();
+          if (checkWin()) return;
+          onDone();
+        }},
+        { text: '不开枪', fn: () => {
+          G.selectedId = null;
+          clearAction();
+          onDone();
+        }},
+      ]
+    });
+  } else {
+    // AI hunter shoots random alive player
+    const targets = G.players.filter(p => p.alive && p.id !== hunterId);
+    if (targets.length) {
+      const tgt = rnd(targets);
+      tgt.alive = false;
+      renderPlayers(null);
+      addSystem(`🔫 猎人 ${hunter.name} 开枪带走了 ${tgt.name}（${ROLES[tgt.role].name}）`);
+      if (checkWin()) return;
+    }
+    onDone();
+  }
 }
 
-// ===== BIND ALL EVENTS HERE (no inline onclick) =====
+// ============================================================
+// END DAY
+// ============================================================
+function endDay() {
+  G.round++;
+  beginNight();
+}
+
+// ============================================================
+// WIN CHECK
+// ============================================================
+function checkWin() {
+  const wolves = G.players.filter(p => p.alive && p.role === 'wolf').length;
+  const good   = G.players.filter(p => p.alive && p.role !== 'wolf').length;
+  if (wolves === 0) { showWin('village'); return true; }
+  if (wolves >= good) { showWin('wolf'); return true; }
+  return false;
+}
+
+function showWin(winner) {
+  const human = G.players[G.humanIdx];
+  const humanWon = (winner === 'wolf') === (human.role === 'wolf');
+
+  const ws = document.getElementById('win-screen');
+  ws.className = (winner === 'wolf' ? 'wolf-win' : 'village-win') + ' open';
+
+  document.getElementById('win-icon').textContent  = winner === 'wolf' ? '🐺' : '🌅';
+  document.getElementById('win-title').textContent = winner === 'wolf' ? '狼人获胜！' : '村民获胜！';
+  document.getElementById('win-sub').textContent   = humanWon ? '🎉 恭喜你！这局你赢了！' : '😢 很遗憾，这局你败了…';
+
+  const list = document.getElementById('reveal-list');
+  list.innerHTML = '';
+  G.players.forEach(p => {
+    const rd = ROLES[p.role];
+    const chip = document.createElement('div');
+    chip.className = 'reveal-chip';
+    chip.textContent = `${p.alive ? '✅' : '❌'} ${p.name} · ${rd.name}${rd.icon}`;
+    list.appendChild(chip);
+  });
+}
+
+// ============================================================
+// BIND EVENTS
+// ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('diff-easy').addEventListener('click', () => setDiff('easy'));
-  document.getElementById('diff-normal').addEventListener('click', () => setDiff('normal'));
-  document.getElementById('diff-hard').addEventListener('click', () => setDiff('hard'));
-  document.getElementById('btn-start').addEventListener('click', initGame);
-  document.getElementById('btn-close-role').addEventListener('click', closeRoleReveal);
-  document.getElementById('night-overlay-btn').addEventListener('click', nightOverlayNext);
+  // Title screen
+  document.getElementById('s-title').classList.add('active');
+
+  document.getElementById('diff-easy').addEventListener('click', () => {
+    difficulty = 'easy';
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('diff-easy').classList.add('active');
+  });
+  document.getElementById('diff-normal').addEventListener('click', () => {
+    difficulty = 'normal';
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('diff-normal').classList.add('active');
+  });
+  document.getElementById('diff-hard').addEventListener('click', () => {
+    difficulty = 'hard';
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('diff-hard').classList.add('active');
+  });
+
+  document.getElementById('btn-start').addEventListener('click', () => {
+    document.getElementById('win-screen').className = '';
+    initGame();
+  });
+
   document.getElementById('btn-replay').addEventListener('click', () => {
-    document.getElementById('win-screen').style.display = 'none';
+    document.getElementById('win-screen').className = '';
     document.getElementById('speech-log').innerHTML = '';
     showScreen('s-title');
   });
