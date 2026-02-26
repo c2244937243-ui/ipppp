@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPulse · IP 地址检测</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root {
+    --bg:#050c18;--bg2:#0a1628;--bg3:#0f2040;
+    --card:rgba(10,22,40,0.9);--border:rgba(0,160,255,0.15);
+    --border-bright:rgba(0,160,255,0.45);--accent:#00a0ff;
+    --accent2:#00d4ff;--text:#e8f4ff;--text2:#7aa8cc;
+    --text3:#3d6a8a;--green:#00e5a0;--yellow:#ffcc00;--red:#ff4d6a;
+    --shadow:0 0 40px rgba(0,160,255,0.12);--glow:0 0 20px rgba(0,160,255,0.3);
+  }
+  [data-theme="light"]{
+    --bg:#f0f6ff;--bg2:#e0ecff;--bg3:#cce0ff;
+    --card:rgba(255,255,255,0.92);--border:rgba(0,100,200,0.15);
+    --border-bright:rgba(0,100,200,0.4);--accent:#0064cc;--accent2:#0099dd;
+    --text:#0a1628;--text2:#2a5080;--text3:#6090b0;
+    --shadow:0 4px 30px rgba(0,100,200,0.1);--glow:0 0 15px rgba(0,100,200,0.2);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .4s,color .4s;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,160,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,160,255,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+  .orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:.18;pointer-events:none;z-index:0;animation:float 8s ease-in-out infinite;}
+  .orb1{width:500px;height:500px;background:#00a0ff;top:-100px;right:-100px;}
+  .orb2{width:400px;height:400px;background:#0040aa;bottom:100px;left:-100px;animation-delay:-4s;}
+  [data-theme="light"] .orb{opacity:.06;}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px)}}
+  nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid var(--border);backdrop-filter:blur(12px);background:rgba(5,12,24,0.7);transition:background .4s;}
+  [data-theme="light"] nav{background:rgba(240,246,255,0.85);}
+  .logo{font-family:'JetBrains Mono',monospace;font-size:1.25rem;font-weight:600;color:var(--accent);letter-spacing:.06em;display:flex;align-items:center;gap:10px;}
+  .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);box-shadow:0 0 10px var(--accent2);animation:pdot 2s ease-in-out infinite;}
+  @keyframes pdot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.5}}
+  .nav-actions{display:flex;align-items:center;gap:12px;}
+  .btn{display:flex;align-items:center;gap:7px;padding:8px 18px;border-radius:8px;border:1px solid var(--border-bright);background:transparent;color:var(--accent);font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;transition:all .2s;font-weight:500;}
+  .btn:hover{background:rgba(0,160,255,.1);box-shadow:var(--glow);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-theme{color:var(--text2);border-color:var(--border);}
+  .btn-theme:hover{color:var(--accent);border-color:var(--border-bright);}
+  main{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:56px 24px 40px;}
+  .hero-label{text-align:center;font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.22em;color:var(--accent);text-transform:uppercase;margin-bottom:14px;opacity:0;animation:fup .6s .2s forwards;}
+  h1{text-align:center;font-size:clamp(1.9rem,5vw,3rem);font-weight:700;line-height:1.15;margin-bottom:10px;opacity:0;animation:fup .6s .35s forwards;}
+  h1 span{color:var(--accent);}
+  .hero-sub{text-align:center;color:var(--text2);font-size:.92rem;margin-bottom:44px;opacity:0;animation:fup .6s .5s forwards;}
+  @keyframes fup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .ip-card{background:var(--card);border:1px solid var(--border-bright);border-radius:20px;padding:40px;backdrop-filter:blur(20px);box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.05);margin-bottom:24px;position:relative;overflow:hidden;opacity:0;animation:fup .6s .65s forwards;}
+  .ip-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent2),transparent);}
+  .scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent2),transparent);opacity:0;pointer-events:none;animation:scan 1.6s ease-in-out .5s forwards;}
+  @keyframes scan{0%{top:0;opacity:0}10%{opacity:.8}90%{opacity:.8}100%{top:100%;opacity:0}}
+  .ip-display{text-align:center;margin-bottom:36px;}
+  .ip-version-tabs{display:flex;gap:6px;justify-content:center;margin-bottom:12px;}
+  .vtab{padding:3px 14px;border-radius:6px;font-size:.72rem;font-family:'JetBrains Mono',monospace;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text3);transition:all .2s;}
+  .vtab.active{border-color:var(--accent);color:var(--accent);background:rgba(0,160,255,.1);}
+  .ip-label{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.25em;color:var(--text3);text-transform:uppercase;margin-bottom:10px;}
+  .ip-address{font-family:'JetBrains Mono',monospace;font-size:clamp(1.8rem,5.5vw,3.4rem);font-weight:600;color:var(--text);letter-spacing:.02em;text-shadow:0 0 30px rgba(0,160,255,.3);word-break:break-all;min-height:60px;display:flex;align-items:center;justify-content:center;}
+  .ip-address.loading{color:var(--text3);animation:blink 1s ease-in-out infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+  .copy-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;}
+  .copy-btn{padding:5px 14px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-size:.78rem;font-family:'JetBrains Mono',monospace;transition:all .2s;}
+  .copy-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;}
+  .info-item{background:rgba(0,160,255,.04);border:1px solid var(--border);border-radius:12px;padding:16px 18px;transition:all .2s;}
+  .info-item:hover{border-color:var(--border-bright);background:rgba(0,160,255,.08);transform:translateY(-1px);}
+  .info-item-label{font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;font-family:'JetBrains Mono',monospace;}
+  .info-item-value{font-size:.9rem;font-weight:600;color:var(--text);min-height:22px;}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:600;font-family:'JetBrains Mono',monospace;}
+  .badge-green{background:rgba(0,229,160,.12);color:var(--green);border:1px solid rgba(0,229,160,.25);}
+  .badge-yellow{background:rgba(255,204,0,.12);color:var(--yellow);border:1px solid rgba(255,204,0,.25);}
+  .badge-red{background:rgba(255,77,106,.12);color:var(--red);border:1px solid rgba(255,77,106,.25);}
+  .badge-blue{background:rgba(0,160,255,.12);color:var(--accent);border:1px solid rgba(0,160,255,.25);}
+  .api-source{text-align:center;color:var(--text3);font-size:.7rem;font-family:'JetBrains Mono',monospace;margin-top:14px;}
+  .status-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin:4px 0 44px;font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--text3);opacity:0;animation:fup .5s 1s forwards;}
+  .sdot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pdot 2s infinite;}
+  .sdot.loading{background:var(--yellow);box-shadow:0 0 8px var(--yellow);}
+  .sdot.error{background:var(--red);box-shadow:0 0 8px var(--red);animation:none;}
+  .lower-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;opacity:0;animation:fup .6s .85s forwards;}
+  @media(max-width:700px){.lower-grid{grid-template-columns:1fr}nav{padding:14px 18px}main{padding:40px 16px 30px}}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;backdrop-filter:blur(20px);}
+  .panel-title{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-family:'JetBrains Mono',monospace;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .panel-title::after{content:'';flex:1;height:1px;background:var(--border);}
+  #map{height:230px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--bg3);}
+  .history-list{display:flex;flex-direction:column;gap:8px;max-height:230px;overflow-y:auto;}
+  .history-list::-webkit-scrollbar{width:3px;}
+  .history-list::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:2px;}
+  .history-item{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-radius:8px;background:rgba(0,160,255,.04);border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:.8rem;transition:border-color .2s;}
+  .history-item:hover{border-color:var(--border-bright);}
+  .h-ip{color:var(--accent2);font-weight:600;}
+  .h-loc{color:var(--text2);font-size:.72rem;margin-top:2px;}
+  .h-time{color:var(--text3);font-size:.68rem;white-space:nowrap;margin-left:10px;}
+  .empty-state{text-align:center;color:var(--text3);padding:40px;font-size:.82rem;font-family:'JetBrains Mono',monospace;}
+  footer{position:relative;z-index:1;text-align:center;padding:22px;border-top:1px solid var(--border);color:var(--text3);font-size:.73rem;font-family:'JetBrains Mono',monospace;}
+  footer a{color:var(--accent);text-decoration:none;}
+  .leaflet-tile{filter:brightness(.6) saturate(.4) hue-rotate(195deg);}
+  [data-theme="light"] .leaflet-tile{filter:none;}
+  .leaflet-container{background:#0a1628!important;}
+  [data-theme="light"] .leaflet-container{background:#ddeeff!important;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinning{display:inline-block;animation:spin .8s linear infinite;}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<nav>
+  <div class="logo"><div class="logo-dot"></div>IPulse</div>
+  <div class="nav-actions">
+    <button class="btn" id="refresh-btn" onclick="refreshIP()"><span id="ri">↺</span> 刷新检测</button>
+    <button class="btn btn-theme" id="theme-btn" onclick="toggleTheme()">🌙 深色</button>
+  </div>
+</nav>
+
+<main>
+  <div class="hero-label">Network Intelligence · Real-time Detection</div>
+  <h1>您的 <span>IP 地址</span> 信息</h1>
+  <p class="hero-sub">实时检测公网 IP 地址 · 地理位置 · 运营商 · 纯净度分析</p>
+
+  <div class="ip-card">
+    <div class="scan-line"></div>
+    <div class="ip-display">
+      <div class="ip-version-tabs">
+        <button class="vtab active" id="v4btn">IPv4</button>
+        <button class="vtab" id="v6btn">IPv6</button>
+      </div>
+      <div class="ip-label">当前公网 IP 地址</div>
+      <div class="ip-address loading" id="ip-addr">检测中...</div>
+      <div class="copy-row">
+        <button class="copy-btn" onclick="copyIP()">⊕ 复制地址</button>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-item-label">所在国家</div><div class="info-item-value" id="f-country">—</div></div>
+      <div class="info-item"><div class="info-item-label">城市 / 地区</div><div class="info-item-value" id="f-city">—</div></div>
+      <div class="info-item"><div class="info-item-label">ISP 运营商</div><div class="info-item-value" id="f-isp">—</div></div>
+      <div class="info-item"><div class="info-item-label">AS 编号</div><div class="info-item-value" id="f-as">—</div></div>
+      <div class="info-item"><div class="info-item-label">时区</div><div class="info-item-value" id="f-tz">—</div></div>
+      <div class="info-item"><div class="info-item-label">坐标</div><div class="info-item-value" id="f-coord">—</div></div>
+      <div class="info-item"><div class="info-item-label">连接类型</div><div class="info-item-value" id="f-type">—</div></div>
+      <div class="info-item"><div class="info-item-label">IP 纯净度</div><div class="info-item-value" id="f-purity">—</div></div>
+    </div>
+    <div class="api-source" id="api-source"></div>
+  </div>
+
+  <div class="status-bar">
+    <div class="sdot loading" id="sdot"></div>
+    <span id="stext">正在获取 IP 信息...</span>
+  </div>
+
+  <div class="lower-grid">
+    <div class="panel">
+      <div class="panel-title">🌍 地理位置地图</div>
+      <div id="map"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">🕐 查询历史</div>
+      <div class="history-list" id="hist-list"><div class="empty-state">暂无历史记录</div></div>
+    </div>
+  </div>
+</main>
+
+<footer>IPulse · 多源 API 聚合检测（ip-api.com / ipwho.is / freeipapi.com）· 数据仅供参考</footer>
+
+<script>
+let map=null,marker=null,currentIP=null,isDark=true;
+let hist=[];
+try{hist=JSON.parse(localStorage.getItem('iph')||'[]');}catch(e){}
+
+// Multiple CORS-friendly IP APIs as fallbacks
+const APIS=[
+  {
+    name:'ip-api.com',
+    // HTTP only (no HTTPS for free tier), but works in browser
+    url:'http://ip-api.com/json/?fields=status,message,country,countryCode,regionName,city,lat,lon,timezone,isp,org,as,proxy,hosting,query',
+    parse:d=>d.status==='success'?{ip:d.query,country:d.country,countryCode:d.countryCode,region:d.regionName,city:d.city,isp:d.isp,org:d.org,as:d.as,timezone:d.timezone,lat:d.lat,lon:d.lon,proxy:d.proxy,hosting:d.hosting}:null
+  },
+  {
+    name:'ipwho.is',
+    url:'https://ipwho.is/',
+    parse:d=>d.success?{ip:d.ip,country:d.country,countryCode:d.country_code,region:d.region,city:d.city,isp:d.connection?.isp||'',org:d.connection?.org||'',as:d.connection?.asn?`AS${d.connection.asn}`:'',timezone:d.timezone?.id||'',lat:d.latitude,lon:d.longitude,proxy:false,hosting:false}:null
+  },
+  {
+    name:'freeipapi.com',
+    url:'https://freeipapi.com/api/json/',
+    parse:d=>d.ipAddress?{ip:d.ipAddress,country:d.countryName,countryCode:d.countryCode,region:d.regionName,city:d.cityName,isp:'',org:'',as:'',timezone:d.timeZone,lat:d.latitude,lon:d.longitude,proxy:false,hosting:false}:null
+  },
+  {
+    name:'ipapi.co',
+    url:'https://ipapi.co/json/',
+    parse:d=>d.ip&&!d.error?{ip:d.ip,country:d.country_name,countryCode:d.country_code,region:d.region,city:d.city,isp:d.org||'',org:d.org||'',as:d.asn||'',timezone:d.timezone,lat:d.latitude,lon:d.longitude,proxy:false,hosting:false}:null
+  },
+  {
+    name:'ipinfo.io',
+    url:'https://ipinfo.io/json',
+    parse:d=>d.ip?{ip:d.ip,country:d.country,countryCode:d.country,region:d.region,city:d.city,isp:d.org||'',org:d.org||'',as:d.org||'',timezone:d.timezone,lat:d.loc?parseFloat(d.loc.split(',')[0]):null,lon:d.loc?parseFloat(d.loc.split(',')[1]):null,proxy:false,hosting:false}:null
+  }
+];
+
+async function fetchIP(){
+  setStatus('loading','正在获取 IP 信息...');
+  setAddrLoading(true);
+  let data=null,usedApi='';
+  for(const api of APIS){
+    try{
+      setStatus('loading',`正在连接 ${api.name}...`);
+      const res=await fetch(api.url,{cache:'no-store'});
+      if(!res.ok) continue;
+      const d=await res.json();
+      data=api.parse(d);
+      if(data&&data.ip){usedApi=api.name;break;}
+    }catch(e){console.warn(`${api.name} failed:`,e.message);}
+  }
+  // last resort: just IP
+  if(!data){
+    try{
+      const r=await fetch('https://api.ipify.org?format=json');
+      const j=await r.json();
+      if(j.ip){data={ip:j.ip};usedApi='api.ipify.org';}
+    }catch(e){}
+  }
+  if(data&&data.ip){renderData(data,usedApi);}
+  else{
+    setAddrLoading(false);
+    document.getElementById('ip-addr').textContent='获取失败';
+    setStatus('error','所有数据源均无法访问，请检查网络');
+  }
+}
+
+function renderData(d,src){
+  currentIP=d.ip;
+  const el=document.getElementById('ip-addr');
+  el.textContent=d.ip;el.classList.remove('loading');
+  const flag=d.countryCode?`https://flagcdn.com/20x15/${d.countryCode.toLowerCase()}.png`:null;
+  const flagH=flag?`<img src="${flag}" style="height:14px;border-radius:2px;margin-right:6px;vertical-align:middle" onerror="this.remove()">`:' ';
+  setVal('f-country',d.country?`${flagH}${d.country}`:'—');
+  setVal('f-city',[d.city,d.region].filter(Boolean).join(' / ')||'—');
+  setVal('f-isp',d.isp||d.org||'—');
+  setVal('f-as',d.as||'—');
+  setVal('f-tz',d.timezone||'—');
+  setVal('f-coord',(d.lat&&d.lon)?`${(+d.lat).toFixed(4)}, ${(+d.lon).toFixed(4)}`:'—');
+  if(d.proxy){setVal('f-type','<span class="badge badge-yellow">⚠ 代理 / VPN</span>');}
+  else if(d.hosting){setVal('f-type','<span class="badge badge-blue">⚙ 数据中心</span>');}
+  else{setVal('f-type','<span class="badge badge-green">✓ 住宅宽带</span>');}
+  if(d.proxy||d.hosting){setVal('f-purity','<span class="badge badge-red">⚠ 可能受污染</span>');}
+  else{setVal('f-purity','<span class="badge badge-green">✓ 纯净</span>');}
+  document.getElementById('api-source').textContent=`数据来源: ${src}`;
+  if(d.lat&&d.lon)initMap(+d.lat,+d.lon,`${d.ip}  ${d.city||''} ${d.country||''}`);
+  const now=new Date();
+  const t=`${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  addHist({ip:d.ip,loc:[d.city,d.country].filter(Boolean).join(', ')||'未知',time:t});
+  setStatus('ok',`✓ 检测完成 · ${new Date().toLocaleTimeString('zh-CN')} · 来源: ${src}`);
+}
+
+function setVal(id,html){document.getElementById(id).innerHTML=html;}
+function setAddrLoading(v){const el=document.getElementById('ip-addr');if(v){el.textContent='检测中...';el.classList.add('loading');}else{el.classList.remove('loading');}}
+function setStatus(type,txt){
+  document.getElementById('stext').textContent=txt;
+  const dot=document.getElementById('sdot');
+  dot.className='sdot '+(type==='loading'?'loading':type==='error'?'error':'');
+}
+function initMap(lat,lng,label){
+  if(!map){
+    map=L.map('map',{zoomControl:false,attributionControl:false}).setView([lat,lng],10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.control.zoom({position:'bottomright'}).addTo(map);
+  }else{map.setView([lat,lng],10);}
+  if(marker)map.removeLayer(marker);
+  marker=L.circleMarker([lat,lng],{radius:10,fillColor:'#00a0ff',color:'#00d4ff',weight:2,opacity:1,fillOpacity:.8}).addTo(map).bindPopup(label||'').openPopup();
+}
+function addHist(item){
+  if(hist.length>0&&hist[0].ip===item.ip)return;
+  hist.unshift(item);if(hist.length>30)hist=hist.slice(0,30);
+  try{localStorage.setItem('iph',JSON.stringify(hist));}catch(e){}
+  renderHist();
+}
+function renderHist(){
+  const el=document.getElementById('hist-list');
+  if(!hist.length){el.innerHTML='<div class="empty-state">暂无历史记录</div>';return;}
+  el.innerHTML=hist.map(h=>`<div class="history-item"><div><div class="h-ip">${h.ip}</div><div class="h-loc">${h.loc}</div></div><div class="h-time">${h.time}</div></div>`).join('');
+}
+async function refreshIP(){
+  const btn=document.getElementById('refresh-btn');
+  const ri=document.getElementById('ri');
+  btn.disabled=true;ri.className='spinning';
+  await fetchIP();
+  btn.disabled=false;ri.className='';
+}
+function copyIP(){
+  if(!currentIP)return;
+  navigator.clipboard.writeText(currentIP).then(()=>setStatus('ok',`✓ 已复制: ${currentIP}`)).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=currentIP;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    setStatus('ok',`✓ 已复制: ${currentIP}`);
+  });
+}
+function toggleTheme(){
+  isDark=!isDark;
+  document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
+  document.getElementById('theme-btn').textContent=isDark?'🌙 深色':'☀️ 浅色';
+}
+renderHist();fetchIP();
+</script>
+</body>
+</html>
