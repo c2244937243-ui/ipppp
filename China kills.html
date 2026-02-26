@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>三国杀 - GitHub 部署版</title>
+    <style>
+        :root {
+            --bg-color: #2c1e16;
+            --card-width: 80px;
+            --card-height: 120px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle, #4a3428 0%, #2c1e16 100%);
+            color: #eee;
+            font-family: "STKaiti", "KaiTi", serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 游戏主舞台 */
+        #game-board {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 角色区域 */
+        .player-area {
+            border: 2px solid #634a3b;
+            border-radius: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        #opponent { position: absolute; top: 20px; }
+        #me { position: absolute; bottom: 150px; }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: #444;
+            border: 3px solid #d4af37;
+            border-radius: 5px;
+            margin: 0 auto 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .hp { color: #ff4444; font-size: 18px; margin-top: 5px; }
+
+        /* 手牌区域 */
+        #hand-cards {
+            height: 140px;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-top: 2px solid #d4af37;
+        }
+
+        .card {
+            width: var(--card-width);
+            height: var(--card-height);
+            background: #fdf5e6;
+            color: #000;
+            border-radius: 8px;
+            border: 2px solid #333;
+            display: flex;
+            flex-direction: column;
+            padding: 5px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .card:hover {
+            transform: translateY(-20px);
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .card.selected {
+            border: 3px solid #ff0000;
+            transform: translateY(-20px);
+        }
+
+        .card-suit { position: absolute; top: 5px; left: 5px; font-size: 14px; }
+        .card-num { position: absolute; top: 20px; left: 5px; font-weight: bold; }
+        .card-name { margin-top: 30px; text-align: center; font-size: 18px; font-weight: bold; }
+
+        /* 按钮区域 */
+        #action-bar {
+            position: absolute;
+            bottom: 160px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #d4af37, #8a6d1d);
+            border: 1px solid #5c4a16;
+            color: #fff;
+            padding: 8px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .btn:disabled { background: #666; cursor: not-allowed; }
+
+        /* 消息提示 */
+        #msg-log {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 150px;
+            height: 200px;
+            background: rgba(0,0,0,0.4);
+            font-size: 12px;
+            padding: 5px;
+            overflow-y: auto;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-board">
+    <div id="opponent" class="player-area">
+        <div class="avatar" style="border-color: #aaa;">司马懿</div>
+        <div>对手</div>
+        <div class="hp">❤❤❤❤</div>
+    </div>
+
+    <div id="msg-log">
+        <div>欢迎来到三国杀</div>
+        <div style="color: #d4af37;">[系统] 游戏开始</div>
+    </div>
+
+    <div id="action-bar">
+        <button class="btn" id="play-btn" onclick="playCard()">出牌</button>
+        <button class="btn" onclick="endTurn()">结束回合</button>
+    </div>
+
+    <div id="me" class="player-area">
+        <div class="avatar">曹操</div>
+        <div>主公 (我)</div>
+        <div id="my-hp" class="hp">❤❤❤❤</div>
+    </div>
+</div>
+
+<div id="hand-cards">
+    <!-- 手牌由 JS 生成 -->
+</div>
+
+<script>
+    const cardData = [
+        { name: '杀', suit: '♠', num: '7', type: 'basic' },
+        { name: '闪', suit: '♢', num: '2', type: 'basic' },
+        { name: '桃', suit: '♡', num: '5', type: 'basic' },
+        { name: '顺手牵羊', suit: '♢', num: '3', type: 'trick' },
+        { name: '过河拆桥', suit: '♣', num: 'Q', type: 'trick' }
+    ];
+
+    let selectedCard = null;
+
+    function initGame() {
+        const handArea = document.getElementById('hand-cards');
+        handArea.innerHTML = '';
+        
+        cardData.forEach((data, index) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => selectCard(card, data);
+            
+            card.innerHTML = `
+                <div class="card-suit" style="color: ${'♥♦'.includes(data.suit) ? 'red' : 'black'}">${data.suit}</div>
+                <div class="card-num">${data.num}</div>
+                <div class="card-name">${data.name}</div>
+            `;
+            handArea.appendChild(card);
+        });
+    }
+
+    function selectCard(cardEl, data) {
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+        if (selectedCard === data) {
+            selectedCard = null;
+        } else {
+            selectedCard = data;
+            cardEl.classList.add('selected');
+        }
+    }
+
+    function playCard() {
+        if (!selectedCard) {
+            log("请先选择一张手牌");
+            return;
+        }
+        log(`你使用了 [${selectedCard.name}]`);
+        // 简单的逻辑模拟
+        if (selectedCard.name === '杀') {
+            log("对手选择了 [闪]");
+        }
+        
+        // 移除该牌
+        const idx = cardData.indexOf(selectedCard);
+        cardData.splice(idx, 1);
+        selectedCard = null;
+        initGame();
+    }
+
+    function endTurn() {
+        log("你结束了回合，对手开始摸牌...");
+    }
+
+    function log(text) {
+        const logArea = document.getElementById('msg-log');
+        const div = document.createElement('div');
+        div.innerText = `[信息] ${text}`;
+        logArea.appendChild(div);
+        logArea.scrollTop = logArea.scrollHeight;
+    }
+
+    // 适配移动端防止缩放
+    document.addEventListener('touchstart', function(event) {
+        if (event.touches.length > 1) {
+            event.preventDefault();
+        }
+    }, { passive: false });
+
+    initGame();
+</script>
+</body>
+</html>
